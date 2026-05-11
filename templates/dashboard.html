@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="refresh" content="3">
+    <title>Brauanlage Dashboard</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding-top: 50px;
+        }
+
+        .card {
+            background: white;
+            width: 400px;
+            margin: auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+
+	}
+
+        .temp {
+            font-size: 40px;
+            margin: 20px;
+        }
+
+        .alarm {
+            color: red;
+            font-weight: bold;
+        }
+
+        .ok {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+
+</head>
+<body>
+
+    <div class="card">
+
+        <h1>🍺 Brauanlage Dashboard</h1>
+
+        <div class="temp"
+     style="color: {% if data.temperature > 75 %} red {% else %} green {% endif %}; transition: 0.5s;
+    ">
+            🌡️ {{ data.temperature }} °C
+        </div>
+
+        <h2>
+            Phase: {{ data.phase }}
+        </h2>
+
+        {% if data.alarm %}
+            <p class="alarm">⚠️ ALARM AKTIV</p>
+        {% else %}
+            <p class="ok">✅ System OK</p>
+        {% endif %}
+
+    </div>
+
+
+</body>
+</html>
