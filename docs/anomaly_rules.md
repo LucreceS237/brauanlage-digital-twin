@@ -35,6 +35,6 @@ Temperaturgradient überschreitet erlaubten Grenzwert über ein 60-s-Fenster.
 
 ### R005 – LOW_FLOW_DURING_LAUTERING
 Im Zustand LAUTERING liegt der Durchfluss unter 0.5 l/min.
-
+zeitfenster
 ### R006 – UNEXPECTED_FLOW_IN_IDLE
 Im Zustand IDLE oder FINISHED existiert Durchfluss.
