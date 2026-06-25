@@ -65,7 +65,7 @@
 
     <div class="container">
 
-        <h1>🍺 Historique des Données</h1>
+        <h1>🍺Datenverlauf</h1>
 
         <table>
 
@@ -99,6 +99,24 @@
             {% endfor %}
 
         </table>
+
+	<table border="1">
+
+<tr>
+    <th>Temperature</th>
+    <th>Phase</th>
+    <th>Alarm</th>
+</tr>
+
+{% for row in rows %}
+<tr>
+    <td>{{ row[1] }}</td>
+    <td>{{ row[2] }}</td>
+    <td>{{ row[3] }}</td>
+</tr>
+{% endfor %}
+
+</table>
 
     </div>
 
