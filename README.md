@@ -1,5 +1,14 @@
 # Brauanlage Digital Twin
 
+## Features
+
+- OPC-UA communication
+- Flask REST API
+- SQLite database
+- Live dashboard
+- Docker support
+- Anomaly detection
+
 ## Overview
 
 This project implements a Digital Twin for an automated brewing system controlled by a Siemens S7-1500 PLC.
@@ -519,3 +528,14 @@ Planned:
 # License
 
 Academic project developed within the System Engineering program.
+```bash
+pip install -r requirements.txt
+python app.py
+
+# Mini Concept
+
+Im Rahmen des Projekts wird ein digitaler Zwilling einer Brauanlage erstellt.
+
+Architecture:
+
+OPC-UA → Flask Backend → SQLite → REST API → Dashboard
