@@ -1,0 +1,230 @@
+@startuml
+title Digital Twin – Brauanlage Zustandsmodell mit gültigen Snapshot-Variablen
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam state {
+  BackgroundColor #F8F8F8
+  BorderColor #2F4F4F
+  FontSize 12
+}
+skinparam note {
+  BackgroundColor #FFFDE7
+  BorderColor #BDB76B
+  FontSize 11
+}
+
+[*] --> IDLE : Systemstart
+
+IDLE --> MASHING : start_requested\nK1_Temperatur > 50°C\nK1_Fuellstand >= 30%\nsensor_ok = true
+
+MASHING --> LAUTERING : mash_finished\n(time_in_state >= 3600 s)
+
+LAUTERING --> BOILING : lautering_finished\n(time >= 3600 s && flow >= 0.5 l/min)
+
+BOILING --> COOLING : boiling_finished\n(time_in_state >= 3600 s)
+
+COOLING --> FERMENTING : cooled_down\n(K3_Temperatur <= 25°C)
+
+FERMENTING --> FINISHED : fermentation_finished
+
+FINISHED --> [*] : Ende
+
+IDLE --> ERROR : process_fault
+MASHING --> ERROR : process_fault
+LAUTERING --> ERROR : process_fault
+BOILING --> ERROR : process_fault
+COOLING --> ERROR : process_fault
+FERMENTING --> ERROR : process_fault
+FINISHED --> ERROR : process_fault
+
+IDLE --> EMERGENCY : emergency_stop / absolute_limit
+MASHING --> EMERGENCY : emergency_stop / absolute_limit
+LAUTERING --> EMERGENCY : emergency_stop / absolute_limit
+BOILING --> EMERGENCY : emergency_stop / absolute_limit
+COOLING --> EMERGENCY : emergency_stop / absolute_limit
+FERMENTING --> EMERGENCY : emergency_stop / absolute_limit
+FINISHED --> EMERGENCY : emergency_stop / absolute_limit
+ERROR --> EMERGENCY : emergency_stop / absolute_limit
+
+ERROR --> IDLE : acknowledge\nno_active_fault\nsensor_ok = true
+EMERGENCY --> IDLE : acknowledge\nemergency_stop = false
+
+
+state IDLE
+note right of IDLE
+Gültige Snapshot-Variablen / Bereiche
+
+state = IDLE
+emergency_stop = false
+sensor_ok = true
+start_requested = false (normal)
+acknowledge = true/false
+
+K1_Temperatur: 0..110 °C
+K2_Temperatur: 0..110 °C
+K3_Temperatur: 0..110 °C
+MobilerSensor_Temperatur: 0..60 °C
+
+Durchfluss_NachgussMaische: 0..0.5 l/min
+
+Startbedingung für Wechsel:
+K1_Temperatur > 50 °C
+K1_Fuellstand >= 30 %
+end note
+
+
+state MASHING
+note right of MASHING
+Gültige Snapshot-Variablen / Bereiche
+
+state = MASHING
+emergency_stop = false
+sensor_ok = true
+
+Hauptbehälter: K2
+K2_Temperatur:
+  K2_Temperatur_SollwertUntereGrenze
+  <= K2_Temperatur
+  <= K2_Temperatur_SollwertObereGrenze
+
+Zieltemperatur: ~65 °C
+time_in_state: 0..3600 s
+Durchfluss_NachgussMaische: 0..0.5 l/min
+K2_Fuellstand: > 0 und plausibel
+end note
+
+
+state LAUTERING
+note right of LAUTERING
+Gültige Snapshot-Variablen / Bereiche
+
+state = LAUTERING
+emergency_stop = false
+sensor_ok = true
+
+Hauptbehälter: K3
+K3_Temperatur:
+  K3_Temperatur_SollwertUntereGrenze
+  <= K3_Temperatur
+  <= K3_Temperatur_SollwertObereGrenze
+
+Durchfluss_NachgussMaische >= 0.5 l/min
+(nach kurzer Grace Period)
+
+K3_Fuellstand:
+  K3_MinimalerFuellstand
+  <= K3_Fuellstand
+  <= K3_MaximalerFuellstand
+
+time_in_state: 0..3600 s
+end note
+
+
+state BOILING
+note right of BOILING
+Gültige Snapshot-Variablen / Bereiche
+
+state = BOILING
+emergency_stop = false
+sensor_ok = true
+
+Hauptbehälter: K3
+K3_Temperatur:
+  K3_Temperatur_SollwertUntereGrenze
+  <= K3_Temperatur
+  <= K3_Temperatur_SollwertObereGrenze
+
+Zieltemperatur: ~100 °C
+time_in_state: 0..3600 s
+Durchfluss_NachgussMaische: 0..0.5 l/min
+end note
+
+
+state COOLING
+note right of COOLING
+Gültige Snapshot-Variablen / Bereiche
+
+state = COOLING
+emergency_stop = false
+sensor_ok = true
+
+Hauptbehälter: K3
+K3_Temperatur: 0..110 °C
+Erwartung: fallender Trend
+cooling_target = 25 °C
+
+Übergang:
+K3_Temperatur <= 25 °C
+
+Durchfluss_NachgussMaische: 0..0.5 l/min
+end note
+
+
+state FERMENTING
+note right of FERMENTING
+Gültige Snapshot-Variablen / Bereiche
+
+state = FERMENTING
+emergency_stop = false
+sensor_ok = true
+
+Hauptsensor: MobilerSensor_Temperatur
+harte Plausibilität: 0..60 °C
+Prozessfenster: 16..22 °C
+Zieltemperatur: ~18 °C
+
+Durchfluss_NachgussMaische: 0..0.5 l/min
+time_in_state: 0..3600 s
+end note
+
+
+state FINISHED
+note right of FINISHED
+Gültige Snapshot-Variablen / Bereiche
+
+state = FINISHED
+emergency_stop = false
+sensor_ok = true
+
+Durchfluss_NachgussMaische: 0..0.5 l/min
+alle Temperaturen nur auf Plausibilität prüfen
+Ausgänge / Aktoren idealerweise aus
+end note
+
+
+state ERROR
+note right of ERROR
+Fehlerzustand
+
+state = ERROR
+emergency_stop = false
+mindestens eine Prozessabweichung aktiv:
+- sensor_ok = false
+- Temperatur außerhalb Grenze
+- Durchfluss ungültig
+- Daten stale / ungültig
+
+Rückkehr:
+acknowledge = true
+keine aktive Störung mehr
+sensor_ok = true
+end note
+
+
+state EMERGENCY
+note right of EMERGENCY
+Sicherheitszustand
+
+state = EMERGENCY
+emergency_stop = true
+
+alle Ausgänge / Aktoren aus
+Prozess nicht normal fortsetzen
+
+Rückkehr:
+acknowledge = true
+emergency_stop = false
+end note
+
+@enduml

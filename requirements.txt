@@ -1,2 +1,4 @@
 flask
 asyncua
+python-dotenv
+pytest
