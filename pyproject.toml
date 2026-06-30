@@ -1,0 +1,8 @@
+[project]
+name = "ap4-brauanlage-faultcoded"
+version = "4.0.0"
+description = "AP4 Digital Twin Brauanlage - fault-coded state machine for AP5/AP6"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]

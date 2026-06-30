@@ -1,4 +1,1 @@
-flask
-asyncua
-python-dotenv
-pytest
+python-docx>=1.1.0
