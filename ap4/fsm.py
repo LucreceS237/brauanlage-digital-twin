@@ -77,42 +77,42 @@ class BrewStateMachine:
 
         if s == BrewState.PRECHECK:
             if (
-                snapshot.k3_level_l >= r.min_k3_start_level_l
-                and r.nachguss_temperature_min_c <= snapshot.k3_temperature_c <= r.nachguss_temperature_max_c
+                snapshot.k1_level_l >= r.min_k1_start_level_l
+                and r.nachguss_temperature_min_c <= snapshot.k1_temperature_c <= r.nachguss_temperature_max_c
                 and snapshot.nv1_closed
                 and snapshot.nv2_closed
                 and snapshot.nv3_closed
             ):
-                return BrewState.NACHGUSS, "PRECHECK_OK", "Vorprüfung erfolgreich. Nachguss aus K3 startet."
+                return BrewState.NACHGUSS, "PRECHECK_OK", "Vorprüfung erfolgreich. Nachguss aus K1 startet."
             return None, "PRECHECK_WAIT", "Vorbedingungen für Nachguss noch nicht erfüllt."
 
         if s == BrewState.NACHGUSS:
-            if t >= r.nachguss_min_duration_s and snapshot.v3_open and snapshot.flow_k3_to_k1_l_min >= r.min_nachguss_flow_l_min and snapshot.k1_level_l >= r.min_k1_mashing_level_l:
-                return BrewState.MASHING, "NACHGUSS_COMPLETE", "K1 ist für Maischen bereit."
+            if t >= r.nachguss_min_duration_s and snapshot.v3_open and snapshot.flow_k1_to_k2_l_min >= r.min_nachguss_flow_l_min and snapshot.k2_level_l >= r.min_k2_mashing_level_l:
+                return BrewState.MASHING, "NACHGUSS_COMPLETE", "K2 ist für Maischen bereit."
             return None, "NACHGUSS_WAIT", "Nachguss läuft."
 
         if s == BrewState.MASHING:
-            if t >= r.mashing_duration_s and r.mashing_temperature_min_c <= snapshot.k1_temperature_c <= r.mashing_temperature_max_c and snapshot.v4_open and snapshot.flow_k1_to_k2_l_min >= r.min_transfer_flow_l_min:
+            if t >= r.mashing_duration_s and r.mashing_temperature_min_c <= snapshot.k2_temperature_c <= r.mashing_temperature_max_c and snapshot.v4_open and snapshot.flow_k2_to_k3_l_min >= r.min_transfer_flow_l_min:
                 return BrewState.LAUTERING, "MASHING_COMPLETE", "Maischen abgeschlossen. Läutern wird freigegeben."
             return None, "MASHING_WAIT", "Maischen noch nicht abgeschlossen."
 
         if s == BrewState.LAUTERING:
-            if t >= r.lautering_duration_s and snapshot.k2_level_l >= r.min_k2_boiling_level_l:
+            if t >= r.lautering_duration_s and snapshot.k3_level_l >= r.min_k3_boiling_level_l:
                 return BrewState.BOILING, "LAUTERING_COMPLETE", "Läutern abgeschlossen. Kochen wird freigegeben."
             return None, "LAUTERING_WAIT", "Läutern läuft."
 
         if s == BrewState.BOILING:
-            if t >= r.boiling_duration_s and r.boiling_temperature_min_c <= snapshot.k2_temperature_c <= r.boiling_temperature_max_c:
+            if t >= r.boiling_duration_s and r.boiling_temperature_min_c <= snapshot.k3_temperature_c <= r.boiling_temperature_max_c:
                 return BrewState.COOLING, "BOILING_COMPLETE", "Kochen abgeschlossen. Kühlung startet."
             return None, "BOILING_WAIT", "Kochen läuft."
 
         if s == BrewState.COOLING:
-            if snapshot.k2_temperature_c <= r.cooling_target_c and snapshot.v5_open and snapshot.pump_on_feedback:
+            if snapshot.k3_temperature_c <= r.cooling_target_c and snapshot.v5_open and snapshot.pump_on_feedback:
                 return BrewState.TRANSFER_TO_K4, "COOLING_COMPLETE", "Kühlziel erreicht. Austrag nach K4 wird freigegeben."
             return None, "COOLING_WAIT", "Kühlung läuft."
 
         if s == BrewState.TRANSFER_TO_K4:
-            if t >= r.transfer_to_k4_duration_s and snapshot.flow_k2_to_k4_l_min >= r.min_transfer_flow_l_min and snapshot.k4_level_l >= r.min_k4_fermentation_level_l:
+            if t >= r.transfer_to_k4_duration_s and snapshot.flow_k3_to_k4_l_min >= r.min_transfer_flow_l_min and snapshot.k4_level_l >= r.min_k4_fermentation_level_l:
                 return BrewState.FERMENTING, "TRANSFER_TO_K4_COMPLETE", "Austrag nach K4 abgeschlossen. Gärung beginnt."
             return None, "TRANSFER_WAIT", "Austrag läuft."
 
