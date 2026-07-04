@@ -1,4 +1,18 @@
-database.db
+# Python
 __pycache__/
-venv/
+*.pyc
+.venv/
+backend/.venv/
+
+# Node / Vite
+node_modules/
+project/ap6/frontend/node_modules/
+project/ap6/frontend/dist/
+project/ap6/frontend/.vite/
+
+# Env / local
 .env
+
+# OS
+.DS_Store
+Thumbs.db

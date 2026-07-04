@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: #0b0f14;
+  color: #e6edf3;
+}
+
+@layer components {
+  /* Shared card surface used across the dashboard. */
+  .card {
+    @apply bg-panel2 border border-edge rounded-xl p-4 shadow-lg;
+  }
+  .card-title {
+    @apply text-xs uppercase tracking-wider text-slate-400 mb-2;
+  }
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply btn bg-accent text-black hover:bg-cyan-300;
+  }
+  .btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-500;
+  }
+  .btn-ghost {
+    @apply btn bg-panel border border-edge text-slate-200 hover:bg-edge;
+  }
+}

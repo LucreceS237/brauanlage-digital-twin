@@ -1,0 +1,99 @@
+services:
+  mongodb:
+    image: mongo:7
+    container_name: brewing_mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: brewing_digital_twin
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: brewing_mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./project/ap2/mosquitto/config:/mosquitto/config
+
+  mqtt_publisher:
+    build:
+      context: .
+      dockerfile: project/ap2/mqtt_publisher/Dockerfile
+    container_name: brewing_mqtt_publisher
+    restart: unless-stopped
+    environment:
+      PUBLISHER_MODE: FAKE_PUBLISHER
+      MQTT_BROKER_HOST: mosquitto
+      MQTT_BROKER_PORT: 1883
+      MQTT_TOPIC: brauanlage/sps/live
+      OPCUA_SERVER_URL: opc.tcp://192.168.0.1:4840
+      SIMULATION_SCENARIO: NORMAL_PROCESS
+      SIMULATION_TOTAL_DURATION_SECONDS: "1800"
+      SIMULATION_TICK_SECONDS: "1"
+      SIMULATION_SPEED_FACTOR: "1"
+    depends_on:
+      - mosquitto
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: brewing_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      MONGODB_URI: mongodb://mongodb:27017/brewing_digital_twin
+      MONGODB_DB_NAME: brewing_digital_twin
+      MQTT_BROKER_HOST: mosquitto
+      MQTT_BROKER_PORT: 1883
+      MQTT_TOPIC: brauanlage/sps/live
+      SPS_MESSAGE_TIMEOUT_SECONDS: "10"
+      ENABLE_SIMULATION_MODE: "true"
+      CORS_ORIGINS: "*"
+      SIMULATION_TOTAL_DURATION_SECONDS: "1800"
+      SIMULATION_TICK_SECONDS: "1"
+      SIMULATION_SPEED_FACTOR: "1"
+      SIMULATION_SCENARIO: NORMAL_PROCESS
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      mosquitto:
+        condition: service_started
+
+  frontend:
+    build:
+      context: ./project/ap6/frontend
+      dockerfile: Dockerfile
+    container_name: brewing_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      VITE_API_BASE_URL: http://localhost:8000
+    depends_on:
+      - backend
+
+  mongo-express:
+    image: mongo-express:1.0.2
+    container_name: brewing_mongo_express
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_BASICAUTH: "false"
+    depends_on:
+      - mongodb
+
+volumes:
+  mongodb_data:
