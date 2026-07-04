@@ -1,0 +1,23 @@
+{
+  "consumer": "AP6_Dashboard_REST_API",
+  "current_state": "error",
+  "display_state": "ERROR_011_K2_BOILING_TEMP_HIGH",
+  "severity": "ERROR",
+  "active_fault_code": "ERROR_011_K2_BOILING_TEMP_HIGH",
+  "operator_message": "K2-Kochtemperatur zu hoch",
+  "recommended_action": "K2-Heizung abschalten und Sensor prüfen.",
+  "subsystem": "K2 Kochen",
+  "signal": "k2_temperature_c",
+  "value": 110,
+  "limit": 102.0,
+  "expected_outputs": {
+    "heater_k2_on": false,
+    "agitator_on": false,
+    "pump_on": false,
+    "v3_open": false,
+    "v4_open": false,
+    "v5_open": false
+  },
+  "transition_counter": 1,
+  "last_transition_reason": "ERROR_011_K2_BOILING_TEMP_HIGH"
+}

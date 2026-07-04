@@ -1,0 +1,23 @@
+{
+  "consumer": "AP6_Dashboard_REST_API",
+  "current_state": "mashing",
+  "display_state": "MASHING",
+  "severity": "NORMAL",
+  "active_fault_code": null,
+  "operator_message": "Aktueller Zustand: MASHING",
+  "recommended_action": "Keine Aktion erforderlich.",
+  "subsystem": null,
+  "signal": null,
+  "value": null,
+  "limit": null,
+  "expected_outputs": {
+    "heater_k2_on": true,
+    "agitator_on": true,
+    "pump_on": false,
+    "v3_open": false,
+    "v4_open": false,
+    "v5_open": false
+  },
+  "transition_counter": 3,
+  "last_transition_reason": "NACHGUSS_COMPLETE"
+}

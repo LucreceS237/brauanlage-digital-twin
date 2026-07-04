@@ -1,0 +1,229 @@
+AP4 FSM Live-/Replay-Simulation mit ProcessSnapshot-Daten
+Equipment: K1=Nachguss, K2=Maischen/Kochen, K3=Läutern, K4=Gären
+Durchfluss: nur K1 -> K2
+====================================================================================================
+
+[001] timestamp=2026-07-01T12:00:00.000 dt_s=1.0
+Snapshot: Schritt=0, K1_T=78.0, K2_T=20.0, K3_L=0.0, K4_L=0.0, DF_K1K2=0.00
+Übergang: IDLE -> IDLE
+Jetzt ist Zustand: IDLE
+Grund: NO_TRANSITION - Keine Übergangsbedingung erfüllt.
+Geändert: NEIN
+AP5 payload: {"consumer": "AP5_Anomalieerkennung", "state": "idle", "display_state": "IDLE", "time_in_state_s": 1.0, "active_fault_code": null, "active_fault_title": null, "active_fault_signal": null, "active_fault_value": null, "active_fault_limit": null, "diagnostics": [], "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "metrics": {"transition_counter": 0, "error_counter": 0, "emergency_counter": 0, "fault_counters": {}}, "last_transition_reason": null}
+AP6 payload: {"consumer": "AP6_Dashboard_REST_API", "current_state": "idle", "display_state": "IDLE", "severity": "NORMAL", "active_fault_code": null, "operator_message": "Aktueller Zustand: IDLE", "recommended_action": "Keine Aktion erforderlich.", "subsystem": null, "signal": null, "value": null, "limit": null, "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "transition_counter": 0, "last_transition_reason": null}
+
+[002] timestamp=2026-07-01T12:00:10.000 dt_s=10.0
+Snapshot: Schritt=1, K1_T=78.0, K2_T=20.0, K3_L=0.0, K4_L=0.0, DF_K1K2=0.00
+Übergang: IDLE -> PRECHECK
+Jetzt ist Zustand: PRECHECK
+Grund: START_REQUESTED - Startanforderung aus AP3/Bedienung erhalten.
+Geändert: JA
+AP5 payload: {"consumer": "AP5_Anomalieerkennung", "state": "precheck", "display_state": "PRECHECK", "time_in_state_s": 0.0, "active_fault_code": null, "active_fault_title": null, "active_fault_signal": null, "active_fault_value": null, "active_fault_limit": null, "diagnostics": [], "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "metrics": {"transition_counter": 1, "error_counter": 0, "emergency_counter": 0, "fault_counters": {}}, "last_transition_reason": "START_REQUESTED"}
+AP6 payload: {"consumer": "AP6_Dashboard_REST_API", "current_state": "precheck", "display_state": "PRECHECK", "severity": "NORMAL", "active_fault_code": null, "operator_message": "Aktueller Zustand: PRECHECK", "recommended_action": "Keine Aktion erforderlich.", "subsystem": null, "signal": null, "value": null, "limit": null, "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "transition_counter": 1, "last_transition_reason": "START_REQUESTED"}
+
+[003] timestamp=2026-07-01T12:00:20.000 dt_s=10.0
+Snapshot: Schritt=1, K1_T=78.0, K2_T=20.0, K3_L=0.0, K4_L=0.0, DF_K1K2=0.00
+Übergang: PRECHECK -> NACHGUSS
+Jetzt ist Zustand: NACHGUSS
+Grund: PRECHECK_OK - K1 Nachgussbehälter bereit. Nachguss K1->K2 startet.
+Geändert: JA
+AP5 payload: {"consumer": "AP5_Anomalieerkennung", "state": "nachguss", "display_state": "NACHGUSS", "time_in_state_s": 0.0, "active_fault_code": null, "active_fault_title": null, "active_fault_signal": null, "active_fault_value": null, "active_fault_limit": null, "diagnostics": [], "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": true, "v4_open": false, "v5_open": false}, "metrics": {"transition_counter": 2, "error_counter": 0, "emergency_counter": 0, "fault_counters": {}}, "last_transition_reason": "PRECHECK_OK"}
+AP6 payload: {"consumer": "AP6_Dashboard_REST_API", "current_state": "nachguss", "display_state": "NACHGUSS", "severity": "NORMAL", "active_fault_code": null, "operator_message": "Aktueller Zustand: NACHGUSS", "recommended_action": "Keine Aktion erforderlich.", "subsystem": null, "signal": null, "value": null, "limit": null, "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": true, "v4_open": false, "v5_open": false}, "transition_counter": 2, "last_transition_reason": "PRECHECK_OK"}
+
+[004] timestamp=2026-07-01T12:01:00.000 dt_s=40.0
+Snapshot: Schritt=2, K1_T=78.0, K2_T=35.0, K3_L=0.0, K4_L=0.0, DF_K1K2=1.20
+Übergang: NACHGUSS -> NACHGUSS
+Jetzt ist Zustand: NACHGUSS
+Grund: NO_TRANSITION - Keine Übergangsbedingung erfüllt.
+Geändert: NEIN
+AP5 payload: {"consumer": "AP5_Anomalieerkennung", "state": "nachguss", "display_state": "NACHGUSS", "time_in_state_s": 40.0, "active_fault_code": null, "active_fault_title": null, "active_fault_signal": null, "active_fault_value": null, "active_fault_limit": null, "diagnostics": [], "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": true, "v4_open": false, "v5_open": false}, "metrics": {"transition_counter": 2, "error_counter": 0, "emergency_counter": 0, "fault_counters": {}}, "last_transition_reason": "PRECHECK_OK"}
+AP6 payload: {"consumer": "AP6_Dashboard_REST_API", "current_state": "nachguss", "display_state": "NACHGUSS", "severity": "NORMAL", "active_fault_code": null, "operator_message": "Aktueller Zustand: NACHGUSS", "recommended_action": "Keine Aktion erforderlich.", "subsystem": null, "signal": null, "value": null, "limit": null, "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": true, "v4_open": false, "v5_open": false}, "transition_counter": 2, "last_transition_reason": "PRECHECK_OK"}
+
+[005] timestamp=2026-07-01T12:02:00.000 dt_s=60.0
+Snapshot: Schritt=2, K1_T=78.0, K2_T=50.0, K3_L=0.0, K4_L=0.0, DF_K1K2=1.20
+Übergang: NACHGUSS -> NACHGUSS
+Jetzt ist Zustand: NACHGUSS
+Grund: NO_TRANSITION - Keine Übergangsbedingung erfüllt.
+Geändert: NEIN
+AP5 payload: {"consumer": "AP5_Anomalieerkennung", "state": "nachguss", "display_state": "NACHGUSS", "time_in_state_s": 100.0, "active_fault_code": null, "active_fault_title": null, "active_fault_signal": null, "active_fault_value": null, "active_fault_limit": null, "diagnostics": [], "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": true, "v4_open": false, "v5_open": false}, "metrics": {"transition_counter": 2, "error_counter": 0, "emergency_counter": 0, "fault_counters": {}}, "last_transition_reason": "PRECHECK_OK"}
+AP6 payload: {"consumer": "AP6_Dashboard_REST_API", "current_state": "nachguss", "display_state": "NACHGUSS", "severity": "NORMAL", "active_fault_code": null, "operator_message": "Aktueller Zustand: NACHGUSS", "recommended_action": "Keine Aktion erforderlich.", "subsystem": null, "signal": null, "value": null, "limit": null, "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": true, "v4_open": false, "v5_open": false}, "transition_counter": 2, "last_transition_reason": "PRECHECK_OK"}
+
+[006] timestamp=2026-07-01T12:02:40.000 dt_s=40.0
+Snapshot: Schritt=2, K1_T=78.0, K2_T=65.0, K3_L=0.0, K4_L=0.0, DF_K1K2=1.20
+Übergang: NACHGUSS -> MASHING
+Jetzt ist Zustand: MASHING
+Grund: NACHGUSS_COMPLETE - K2 hat genügend Nachguss/Maische. Maischen wird freigegeben.
+Geändert: JA
+AP5 payload: {"consumer": "AP5_Anomalieerkennung", "state": "mashing", "display_state": "MASHING", "time_in_state_s": 0.0, "active_fault_code": null, "active_fault_title": null, "active_fault_signal": null, "active_fault_value": null, "active_fault_limit": null, "diagnostics": [], "expected_outputs": {"heater_k2_on": true, "agitator_on": true, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "metrics": {"transition_counter": 3, "error_counter": 0, "emergency_counter": 0, "fault_counters": {}}, "last_transition_reason": "NACHGUSS_COMPLETE"}
+AP6 payload: {"consumer": "AP6_Dashboard_REST_API", "current_state": "mashing", "display_state": "MASHING", "severity": "NORMAL", "active_fault_code": null, "operator_message": "Aktueller Zustand: MASHING", "recommended_action": "Keine Aktion erforderlich.", "subsystem": null, "signal": null, "value": null, "limit": null, "expected_outputs": {"heater_k2_on": true, "agitator_on": true, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "transition_counter": 3, "last_transition_reason": "NACHGUSS_COMPLETE"}
+
+[007] timestamp=2026-07-01T12:03:40.000 dt_s=60.0
+Snapshot: Schritt=3, K1_T=78.0, K2_T=65.0, K3_L=0.0, K4_L=0.0, DF_K1K2=0.00
+Übergang: MASHING -> MASHING
+Jetzt ist Zustand: MASHING
+Grund: NO_TRANSITION - Keine Übergangsbedingung erfüllt.
+Geändert: NEIN
+AP5 payload: {"consumer": "AP5_Anomalieerkennung", "state": "mashing", "display_state": "MASHING", "time_in_state_s": 60.0, "active_fault_code": null, "active_fault_title": null, "active_fault_signal": null, "active_fault_value": null, "active_fault_limit": null, "diagnostics": [], "expected_outputs": {"heater_k2_on": true, "agitator_on": true, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "metrics": {"transition_counter": 3, "error_counter": 0, "emergency_counter": 0, "fault_counters": {}}, "last_transition_reason": "NACHGUSS_COMPLETE"}
+AP6 payload: {"consumer": "AP6_Dashboard_REST_API", "current_state": "mashing", "display_state": "MASHING", "severity": "NORMAL", "active_fault_code": null, "operator_message": "Aktueller Zustand: MASHING", "recommended_action": "Keine Aktion erforderlich.", "subsystem": null, "signal": null, "value": null, "limit": null, "expected_outputs": {"heater_k2_on": true, "agitator_on": true, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "transition_counter": 3, "last_transition_reason": "NACHGUSS_COMPLETE"}
+
+[008] timestamp=2026-07-01T12:05:00.000 dt_s=80.0
+Snapshot: Schritt=3, K1_T=78.0, K2_T=65.0, K3_L=0.0, K4_L=0.0, DF_K1K2=0.00
+Übergang: MASHING -> MASHING
+Jetzt ist Zustand: MASHING
+Grund: NO_TRANSITION - Keine Übergangsbedingung erfüllt.
+Geändert: NEIN
+AP5 payload: {"consumer": "AP5_Anomalieerkennung", "state": "mashing", "display_state": "MASHING", "time_in_state_s": 140.0, "active_fault_code": null, "active_fault_title": null, "active_fault_signal": null, "active_fault_value": null, "active_fault_limit": null, "diagnostics": [], "expected_outputs": {"heater_k2_on": true, "agitator_on": true, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "metrics": {"transition_counter": 3, "error_counter": 0, "emergency_counter": 0, "fault_counters": {}}, "last_transition_reason": "NACHGUSS_COMPLETE"}
+AP6 payload: {"consumer": "AP6_Dashboard_REST_API", "current_state": "mashing", "display_state": "MASHING", "severity": "NORMAL", "active_fault_code": null, "operator_message": "Aktueller Zustand: MASHING", "recommended_action": "Keine Aktion erforderlich.", "subsystem": null, "signal": null, "value": null, "limit": null, "expected_outputs": {"heater_k2_on": true, "agitator_on": true, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "transition_counter": 3, "last_transition_reason": "NACHGUSS_COMPLETE"}
+
+[009] timestamp=2026-07-01T12:06:00.000 dt_s=60.0
+Snapshot: Schritt=3, K1_T=78.0, K2_T=66.0, K3_L=0.0, K4_L=0.0, DF_K1K2=0.00
+Übergang: MASHING -> TRANSFER_TO_K3
+Jetzt ist Zustand: TRANSFER_TO_K3
+Grund: MASHING_COMPLETE - Maischen in K2 abgeschlossen. Transfer zum Läuterbehälter K3 wird freigegeben.
+Geändert: JA
+AP5 payload: {"consumer": "AP5_Anomalieerkennung", "state": "transfer_to_k3", "display_state": "TRANSFER_TO_K3", "time_in_state_s": 0.0, "active_fault_code": null, "active_fault_title": null, "active_fault_signal": null, "active_fault_value": null, "active_fault_limit": null, "diagnostics": [], "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": true, "v5_open": false}, "metrics": {"transition_counter": 4, "error_counter": 0, "emergency_counter": 0, "fault_counters": {}}, "last_transition_reason": "MASHING_COMPLETE"}
+AP6 payload: {"consumer": "AP6_Dashboard_REST_API", "current_state": "transfer_to_k3", "display_state": "TRANSFER_TO_K3", "severity": "NORMAL", "active_fault_code": null, "operator_message": "Aktueller Zustand: TRANSFER_TO_K3", "recommended_action": "Keine Aktion erforderlich.", "subsystem": null, "signal": null, "value": null, "limit": null, "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": true, "v5_open": false}, "transition_counter": 4, "last_transition_reason": "MASHING_COMPLETE"}
+
+[010] timestamp=2026-07-01T12:07:00.000 dt_s=60.0
+Snapshot: Schritt=4, K1_T=78.0, K2_T=66.0, K3_L=6.0, K4_L=0.0, DF_K1K2=0.00
+Übergang: TRANSFER_TO_K3 -> TRANSFER_TO_K3
+Jetzt ist Zustand: TRANSFER_TO_K3
+Grund: NO_TRANSITION - Keine Übergangsbedingung erfüllt.
+Geändert: NEIN
+AP5 payload: {"consumer": "AP5_Anomalieerkennung", "state": "transfer_to_k3", "display_state": "TRANSFER_TO_K3", "time_in_state_s": 60.0, "active_fault_code": null, "active_fault_title": null, "active_fault_signal": null, "active_fault_value": null, "active_fault_limit": null, "diagnostics": [], "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": true, "v5_open": false}, "metrics": {"transition_counter": 4, "error_counter": 0, "emergency_counter": 0, "fault_counters": {}}, "last_transition_reason": "MASHING_COMPLETE"}
+AP6 payload: {"consumer": "AP6_Dashboard_REST_API", "current_state": "transfer_to_k3", "display_state": "TRANSFER_TO_K3", "severity": "NORMAL", "active_fault_code": null, "operator_message": "Aktueller Zustand: TRANSFER_TO_K3", "recommended_action": "Keine Aktion erforderlich.", "subsystem": null, "signal": null, "value": null, "limit": null, "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": true, "v5_open": false}, "transition_counter": 4, "last_transition_reason": "MASHING_COMPLETE"}
+
+[011] timestamp=2026-07-01T12:08:10.000 dt_s=70.0
+Snapshot: Schritt=4, K1_T=78.0, K2_T=66.0, K3_L=16.0, K4_L=0.0, DF_K1K2=0.00
+Übergang: TRANSFER_TO_K3 -> LAUTERING
+Jetzt ist Zustand: LAUTERING
+Grund: TRANSFER_TO_K3_COMPLETE - K3 enthält genügend Würze/Maische. Läutern startet.
+Geändert: JA
+AP5 payload: {"consumer": "AP5_Anomalieerkennung", "state": "lautering", "display_state": "LAUTERING", "time_in_state_s": 0.0, "active_fault_code": null, "active_fault_title": null, "active_fault_signal": null, "active_fault_value": null, "active_fault_limit": null, "diagnostics": [], "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "metrics": {"transition_counter": 5, "error_counter": 0, "emergency_counter": 0, "fault_counters": {}}, "last_transition_reason": "TRANSFER_TO_K3_COMPLETE"}
+AP6 payload: {"consumer": "AP6_Dashboard_REST_API", "current_state": "lautering", "display_state": "LAUTERING", "severity": "NORMAL", "active_fault_code": null, "operator_message": "Aktueller Zustand: LAUTERING", "recommended_action": "Keine Aktion erforderlich.", "subsystem": null, "signal": null, "value": null, "limit": null, "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "transition_counter": 5, "last_transition_reason": "TRANSFER_TO_K3_COMPLETE"}
+
+[012] timestamp=2026-07-01T12:09:20.000 dt_s=70.0
+Snapshot: Schritt=5, K1_T=78.0, K2_T=66.0, K3_L=16.0, K4_L=0.0, DF_K1K2=0.00
+Übergang: LAUTERING -> LAUTERING
+Jetzt ist Zustand: LAUTERING
+Grund: NO_TRANSITION - Keine Übergangsbedingung erfüllt.
+Geändert: NEIN
+AP5 payload: {"consumer": "AP5_Anomalieerkennung", "state": "lautering", "display_state": "LAUTERING", "time_in_state_s": 70.0, "active_fault_code": null, "active_fault_title": null, "active_fault_signal": null, "active_fault_value": null, "active_fault_limit": null, "diagnostics": [], "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "metrics": {"transition_counter": 5, "error_counter": 0, "emergency_counter": 0, "fault_counters": {}}, "last_transition_reason": "TRANSFER_TO_K3_COMPLETE"}
+AP6 payload: {"consumer": "AP6_Dashboard_REST_API", "current_state": "lautering", "display_state": "LAUTERING", "severity": "NORMAL", "active_fault_code": null, "operator_message": "Aktueller Zustand: LAUTERING", "recommended_action": "Keine Aktion erforderlich.", "subsystem": null, "signal": null, "value": null, "limit": null, "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "transition_counter": 5, "last_transition_reason": "TRANSFER_TO_K3_COMPLETE"}
+
+[013] timestamp=2026-07-01T12:10:30.000 dt_s=70.0
+Snapshot: Schritt=5, K1_T=78.0, K2_T=80.0, K3_L=16.0, K4_L=0.0, DF_K1K2=0.00
+Übergang: LAUTERING -> BOILING
+Jetzt ist Zustand: BOILING
+Grund: LAUTERING_COMPLETE - Läutern abgeschlossen. Kochphase in K2 wird freigegeben.
+Geändert: JA
+AP5 payload: {"consumer": "AP5_Anomalieerkennung", "state": "boiling", "display_state": "BOILING", "time_in_state_s": 0.0, "active_fault_code": null, "active_fault_title": null, "active_fault_signal": null, "active_fault_value": null, "active_fault_limit": null, "diagnostics": [], "expected_outputs": {"heater_k2_on": true, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "metrics": {"transition_counter": 6, "error_counter": 0, "emergency_counter": 0, "fault_counters": {}}, "last_transition_reason": "LAUTERING_COMPLETE"}
+AP6 payload: {"consumer": "AP6_Dashboard_REST_API", "current_state": "boiling", "display_state": "BOILING", "severity": "NORMAL", "active_fault_code": null, "operator_message": "Aktueller Zustand: BOILING", "recommended_action": "Keine Aktion erforderlich.", "subsystem": null, "signal": null, "value": null, "limit": null, "expected_outputs": {"heater_k2_on": true, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "transition_counter": 6, "last_transition_reason": "LAUTERING_COMPLETE"}
+
+[014] timestamp=2026-07-01T12:11:30.000 dt_s=60.0
+Snapshot: Schritt=5, K1_T=78.0, K2_T=99.0, K3_L=16.0, K4_L=0.0, DF_K1K2=0.00
+Übergang: BOILING -> BOILING
+Jetzt ist Zustand: BOILING
+Grund: NO_TRANSITION - Keine Übergangsbedingung erfüllt.
+Geändert: NEIN
+AP5 payload: {"consumer": "AP5_Anomalieerkennung", "state": "boiling", "display_state": "BOILING", "time_in_state_s": 60.0, "active_fault_code": null, "active_fault_title": null, "active_fault_signal": null, "active_fault_value": null, "active_fault_limit": null, "diagnostics": [], "expected_outputs": {"heater_k2_on": true, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "metrics": {"transition_counter": 6, "error_counter": 0, "emergency_counter": 0, "fault_counters": {}}, "last_transition_reason": "LAUTERING_COMPLETE"}
+AP6 payload: {"consumer": "AP6_Dashboard_REST_API", "current_state": "boiling", "display_state": "BOILING", "severity": "NORMAL", "active_fault_code": null, "operator_message": "Aktueller Zustand: BOILING", "recommended_action": "Keine Aktion erforderlich.", "subsystem": null, "signal": null, "value": null, "limit": null, "expected_outputs": {"heater_k2_on": true, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "transition_counter": 6, "last_transition_reason": "LAUTERING_COMPLETE"}
+
+[015] timestamp=2026-07-01T12:12:30.000 dt_s=60.0
+Snapshot: Schritt=6, K1_T=78.0, K2_T=99.0, K3_L=16.0, K4_L=0.0, DF_K1K2=0.00
+Übergang: BOILING -> BOILING
+Jetzt ist Zustand: BOILING
+Grund: NO_TRANSITION - Keine Übergangsbedingung erfüllt.
+Geändert: NEIN
+AP5 payload: {"consumer": "AP5_Anomalieerkennung", "state": "boiling", "display_state": "BOILING", "time_in_state_s": 120.0, "active_fault_code": null, "active_fault_title": null, "active_fault_signal": null, "active_fault_value": null, "active_fault_limit": null, "diagnostics": [], "expected_outputs": {"heater_k2_on": true, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "metrics": {"transition_counter": 6, "error_counter": 0, "emergency_counter": 0, "fault_counters": {}}, "last_transition_reason": "LAUTERING_COMPLETE"}
+AP6 payload: {"consumer": "AP6_Dashboard_REST_API", "current_state": "boiling", "display_state": "BOILING", "severity": "NORMAL", "active_fault_code": null, "operator_message": "Aktueller Zustand: BOILING", "recommended_action": "Keine Aktion erforderlich.", "subsystem": null, "signal": null, "value": null, "limit": null, "expected_outputs": {"heater_k2_on": true, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "transition_counter": 6, "last_transition_reason": "LAUTERING_COMPLETE"}
+
+[016] timestamp=2026-07-01T12:14:10.000 dt_s=100.0
+Snapshot: Schritt=6, K1_T=78.0, K2_T=100.0, K3_L=16.0, K4_L=0.0, DF_K1K2=0.00
+Übergang: BOILING -> COOLING
+Jetzt ist Zustand: COOLING
+Grund: BOILING_COMPLETE - Kochen abgeschlossen. Kühlung startet.
+Geändert: JA
+AP5 payload: {"consumer": "AP5_Anomalieerkennung", "state": "cooling", "display_state": "COOLING", "time_in_state_s": 0.0, "active_fault_code": null, "active_fault_title": null, "active_fault_signal": null, "active_fault_value": null, "active_fault_limit": null, "diagnostics": [], "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "metrics": {"transition_counter": 7, "error_counter": 0, "emergency_counter": 0, "fault_counters": {}}, "last_transition_reason": "BOILING_COMPLETE"}
+AP6 payload: {"consumer": "AP6_Dashboard_REST_API", "current_state": "cooling", "display_state": "COOLING", "severity": "NORMAL", "active_fault_code": null, "operator_message": "Aktueller Zustand: COOLING", "recommended_action": "Keine Aktion erforderlich.", "subsystem": null, "signal": null, "value": null, "limit": null, "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "transition_counter": 7, "last_transition_reason": "BOILING_COMPLETE"}
+
+[017] timestamp=2026-07-01T12:15:30.000 dt_s=80.0
+Snapshot: Schritt=6, K1_T=78.0, K2_T=99.0, K3_L=16.0, K4_L=0.0, DF_K1K2=0.00
+Übergang: COOLING -> COOLING
+Jetzt ist Zustand: COOLING
+Grund: NO_TRANSITION - Keine Übergangsbedingung erfüllt.
+Geändert: NEIN
+AP5 payload: {"consumer": "AP5_Anomalieerkennung", "state": "cooling", "display_state": "COOLING", "time_in_state_s": 80.0, "active_fault_code": null, "active_fault_title": null, "active_fault_signal": null, "active_fault_value": null, "active_fault_limit": null, "diagnostics": [], "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "metrics": {"transition_counter": 7, "error_counter": 0, "emergency_counter": 0, "fault_counters": {}}, "last_transition_reason": "BOILING_COMPLETE"}
+AP6 payload: {"consumer": "AP6_Dashboard_REST_API", "current_state": "cooling", "display_state": "COOLING", "severity": "NORMAL", "active_fault_code": null, "operator_message": "Aktueller Zustand: COOLING", "recommended_action": "Keine Aktion erforderlich.", "subsystem": null, "signal": null, "value": null, "limit": null, "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "transition_counter": 7, "last_transition_reason": "BOILING_COMPLETE"}
+
+[018] timestamp=2026-07-01T12:16:50.000 dt_s=80.0
+Snapshot: Schritt=7, K1_T=78.0, K2_T=60.0, K3_L=16.0, K4_L=0.0, DF_K1K2=0.00
+Übergang: COOLING -> COOLING
+Jetzt ist Zustand: COOLING
+Grund: NO_TRANSITION - Keine Übergangsbedingung erfüllt.
+Geändert: NEIN
+AP5 payload: {"consumer": "AP5_Anomalieerkennung", "state": "cooling", "display_state": "COOLING", "time_in_state_s": 160.0, "active_fault_code": null, "active_fault_title": null, "active_fault_signal": null, "active_fault_value": null, "active_fault_limit": null, "diagnostics": [], "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "metrics": {"transition_counter": 7, "error_counter": 0, "emergency_counter": 0, "fault_counters": {}}, "last_transition_reason": "BOILING_COMPLETE"}
+AP6 payload: {"consumer": "AP6_Dashboard_REST_API", "current_state": "cooling", "display_state": "COOLING", "severity": "NORMAL", "active_fault_code": null, "operator_message": "Aktueller Zustand: COOLING", "recommended_action": "Keine Aktion erforderlich.", "subsystem": null, "signal": null, "value": null, "limit": null, "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "transition_counter": 7, "last_transition_reason": "BOILING_COMPLETE"}
+
+[019] timestamp=2026-07-01T12:17:50.000 dt_s=60.0
+Snapshot: Schritt=7, K1_T=78.0, K2_T=35.0, K3_L=16.0, K4_L=0.0, DF_K1K2=0.00
+Übergang: COOLING -> COOLING
+Jetzt ist Zustand: COOLING
+Grund: NO_TRANSITION - Keine Übergangsbedingung erfüllt.
+Geändert: NEIN
+AP5 payload: {"consumer": "AP5_Anomalieerkennung", "state": "cooling", "display_state": "COOLING", "time_in_state_s": 220.0, "active_fault_code": null, "active_fault_title": null, "active_fault_signal": null, "active_fault_value": null, "active_fault_limit": null, "diagnostics": [], "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "metrics": {"transition_counter": 7, "error_counter": 0, "emergency_counter": 0, "fault_counters": {}}, "last_transition_reason": "BOILING_COMPLETE"}
+AP6 payload: {"consumer": "AP6_Dashboard_REST_API", "current_state": "cooling", "display_state": "COOLING", "severity": "NORMAL", "active_fault_code": null, "operator_message": "Aktueller Zustand: COOLING", "recommended_action": "Keine Aktion erforderlich.", "subsystem": null, "signal": null, "value": null, "limit": null, "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "transition_counter": 7, "last_transition_reason": "BOILING_COMPLETE"}
+
+[020] timestamp=2026-07-01T12:18:30.000 dt_s=40.0
+Snapshot: Schritt=7, K1_T=78.0, K2_T=24.0, K3_L=16.0, K4_L=0.0, DF_K1K2=0.00
+Übergang: COOLING -> TRANSFER_TO_K4
+Jetzt ist Zustand: TRANSFER_TO_K4
+Grund: COOLING_COMPLETE - Kühlziel erreicht. Transfer nach K4 wird freigegeben.
+Geändert: JA
+AP5 payload: {"consumer": "AP5_Anomalieerkennung", "state": "transfer_to_k4", "display_state": "TRANSFER_TO_K4", "time_in_state_s": 0.0, "active_fault_code": null, "active_fault_title": null, "active_fault_signal": null, "active_fault_value": null, "active_fault_limit": null, "diagnostics": [], "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": true, "v3_open": false, "v4_open": false, "v5_open": true}, "metrics": {"transition_counter": 8, "error_counter": 0, "emergency_counter": 0, "fault_counters": {}}, "last_transition_reason": "COOLING_COMPLETE"}
+AP6 payload: {"consumer": "AP6_Dashboard_REST_API", "current_state": "transfer_to_k4", "display_state": "TRANSFER_TO_K4", "severity": "NORMAL", "active_fault_code": null, "operator_message": "Aktueller Zustand: TRANSFER_TO_K4", "recommended_action": "Keine Aktion erforderlich.", "subsystem": null, "signal": null, "value": null, "limit": null, "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": true, "v3_open": false, "v4_open": false, "v5_open": true}, "transition_counter": 8, "last_transition_reason": "COOLING_COMPLETE"}
+
+[021] timestamp=2026-07-01T12:19:30.000 dt_s=60.0
+Snapshot: Schritt=8, K1_T=78.0, K2_T=24.0, K3_L=16.0, K4_L=6.0, DF_K1K2=0.00
+Übergang: TRANSFER_TO_K4 -> TRANSFER_TO_K4
+Jetzt ist Zustand: TRANSFER_TO_K4
+Grund: NO_TRANSITION - Keine Übergangsbedingung erfüllt.
+Geändert: NEIN
+AP5 payload: {"consumer": "AP5_Anomalieerkennung", "state": "transfer_to_k4", "display_state": "TRANSFER_TO_K4", "time_in_state_s": 60.0, "active_fault_code": null, "active_fault_title": null, "active_fault_signal": null, "active_fault_value": null, "active_fault_limit": null, "diagnostics": [], "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": true, "v3_open": false, "v4_open": false, "v5_open": true}, "metrics": {"transition_counter": 8, "error_counter": 0, "emergency_counter": 0, "fault_counters": {}}, "last_transition_reason": "COOLING_COMPLETE"}
+AP6 payload: {"consumer": "AP6_Dashboard_REST_API", "current_state": "transfer_to_k4", "display_state": "TRANSFER_TO_K4", "severity": "NORMAL", "active_fault_code": null, "operator_message": "Aktueller Zustand: TRANSFER_TO_K4", "recommended_action": "Keine Aktion erforderlich.", "subsystem": null, "signal": null, "value": null, "limit": null, "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": true, "v3_open": false, "v4_open": false, "v5_open": true}, "transition_counter": 8, "last_transition_reason": "COOLING_COMPLETE"}
+
+[022] timestamp=2026-07-01T12:20:40.000 dt_s=70.0
+Snapshot: Schritt=8, K1_T=78.0, K2_T=24.0, K3_L=16.0, K4_L=16.0, DF_K1K2=0.00
+Übergang: TRANSFER_TO_K4 -> FERMENTING
+Jetzt ist Zustand: FERMENTING
+Grund: TRANSFER_TO_K4_COMPLETE - K4 enthält genügend Jungbier. Gärung beginnt.
+Geändert: JA
+AP5 payload: {"consumer": "AP5_Anomalieerkennung", "state": "fermenting", "display_state": "FERMENTING", "time_in_state_s": 0.0, "active_fault_code": null, "active_fault_title": null, "active_fault_signal": null, "active_fault_value": null, "active_fault_limit": null, "diagnostics": [], "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "metrics": {"transition_counter": 9, "error_counter": 0, "emergency_counter": 0, "fault_counters": {}}, "last_transition_reason": "TRANSFER_TO_K4_COMPLETE"}
+AP6 payload: {"consumer": "AP6_Dashboard_REST_API", "current_state": "fermenting", "display_state": "FERMENTING", "severity": "NORMAL", "active_fault_code": null, "operator_message": "Aktueller Zustand: FERMENTING", "recommended_action": "Keine Aktion erforderlich.", "subsystem": null, "signal": null, "value": null, "limit": null, "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "transition_counter": 9, "last_transition_reason": "TRANSFER_TO_K4_COMPLETE"}
+
+[023] timestamp=2026-07-01T12:21:40.000 dt_s=60.0
+Snapshot: Schritt=9, K1_T=78.0, K2_T=24.0, K3_L=16.0, K4_L=16.0, DF_K1K2=0.00
+Übergang: FERMENTING -> FERMENTING
+Jetzt ist Zustand: FERMENTING
+Grund: NO_TRANSITION - Keine Übergangsbedingung erfüllt.
+Geändert: NEIN
+AP5 payload: {"consumer": "AP5_Anomalieerkennung", "state": "fermenting", "display_state": "FERMENTING", "time_in_state_s": 60.0, "active_fault_code": null, "active_fault_title": null, "active_fault_signal": null, "active_fault_value": null, "active_fault_limit": null, "diagnostics": [], "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "metrics": {"transition_counter": 9, "error_counter": 0, "emergency_counter": 0, "fault_counters": {}}, "last_transition_reason": "TRANSFER_TO_K4_COMPLETE"}
+AP6 payload: {"consumer": "AP6_Dashboard_REST_API", "current_state": "fermenting", "display_state": "FERMENTING", "severity": "NORMAL", "active_fault_code": null, "operator_message": "Aktueller Zustand: FERMENTING", "recommended_action": "Keine Aktion erforderlich.", "subsystem": null, "signal": null, "value": null, "limit": null, "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "transition_counter": 9, "last_transition_reason": "TRANSFER_TO_K4_COMPLETE"}
+
+[024] timestamp=2026-07-01T12:23:20.000 dt_s=100.0
+Snapshot: Schritt=9, K1_T=78.0, K2_T=24.0, K3_L=16.0, K4_L=16.0, DF_K1K2=0.00
+Übergang: FERMENTING -> FERMENTING
+Jetzt ist Zustand: FERMENTING
+Grund: NO_TRANSITION - Keine Übergangsbedingung erfüllt.
+Geändert: NEIN
+AP5 payload: {"consumer": "AP5_Anomalieerkennung", "state": "fermenting", "display_state": "FERMENTING", "time_in_state_s": 160.0, "active_fault_code": null, "active_fault_title": null, "active_fault_signal": null, "active_fault_value": null, "active_fault_limit": null, "diagnostics": [], "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "metrics": {"transition_counter": 9, "error_counter": 0, "emergency_counter": 0, "fault_counters": {}}, "last_transition_reason": "TRANSFER_TO_K4_COMPLETE"}
+AP6 payload: {"consumer": "AP6_Dashboard_REST_API", "current_state": "fermenting", "display_state": "FERMENTING", "severity": "NORMAL", "active_fault_code": null, "operator_message": "Aktueller Zustand: FERMENTING", "recommended_action": "Keine Aktion erforderlich.", "subsystem": null, "signal": null, "value": null, "limit": null, "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "transition_counter": 9, "last_transition_reason": "TRANSFER_TO_K4_COMPLETE"}
+
+[025] timestamp=2026-07-01T12:25:00.000 dt_s=100.0
+Snapshot: Schritt=9, K1_T=78.0, K2_T=24.0, K3_L=16.0, K4_L=16.0, DF_K1K2=0.00
+Übergang: FERMENTING -> FINISHED
+Jetzt ist Zustand: FINISHED
+Grund: FERMENTATION_COMPLETE - Gärung abgeschlossen. Prozess beendet.
+Geändert: JA
+AP5 payload: {"consumer": "AP5_Anomalieerkennung", "state": "finished", "display_state": "FINISHED", "time_in_state_s": 0.0, "active_fault_code": null, "active_fault_title": null, "active_fault_signal": null, "active_fault_value": null, "active_fault_limit": null, "diagnostics": [], "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "metrics": {"transition_counter": 10, "error_counter": 0, "emergency_counter": 0, "fault_counters": {}}, "last_transition_reason": "FERMENTATION_COMPLETE"}
+AP6 payload: {"consumer": "AP6_Dashboard_REST_API", "current_state": "finished", "display_state": "FINISHED", "severity": "NORMAL", "active_fault_code": null, "operator_message": "Aktueller Zustand: FINISHED", "recommended_action": "Keine Aktion erforderlich.", "subsystem": null, "signal": null, "value": null, "limit": null, "expected_outputs": {"heater_k2_on": false, "agitator_on": false, "pump_on": false, "v3_open": false, "v4_open": false, "v5_open": false}, "transition_counter": 10, "last_transition_reason": "FERMENTATION_COMPLETE"}

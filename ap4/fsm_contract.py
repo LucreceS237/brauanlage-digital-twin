@@ -8,7 +8,6 @@ from .states import BrewState
 
 @dataclass(frozen=True)
 class ExpectedOutputs:
-    heater_k1_on: bool = False
     heater_k2_on: bool = False
     agitator_on: bool = False
     pump_on: bool = False

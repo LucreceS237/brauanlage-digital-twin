@@ -1,0 +1,39 @@
+{
+  "consumer": "AP5_Anomalieerkennung",
+  "state": "error",
+  "display_state": "ERROR_011_K2_BOILING_TEMP_HIGH",
+  "time_in_state_s": 0.0,
+  "active_fault_code": "ERROR_011_K2_BOILING_TEMP_HIGH",
+  "active_fault_title": "K2-Kochtemperatur zu hoch",
+  "active_fault_signal": "k2_temperature_c",
+  "active_fault_value": 110,
+  "active_fault_limit": 102.0,
+  "diagnostics": [
+    {
+      "severity": "error",
+      "code": "ERROR_011_K2_BOILING_TEMP_HIGH",
+      "title": "K2-Kochtemperatur zu hoch",
+      "signal": "k2_temperature_c",
+      "value": 110,
+      "limit": 102.0,
+      "message": "K2-Kochtemperatur zu hoch"
+    }
+  ],
+  "expected_outputs": {
+    "heater_k2_on": false,
+    "agitator_on": false,
+    "pump_on": false,
+    "v3_open": false,
+    "v4_open": false,
+    "v5_open": false
+  },
+  "metrics": {
+    "transition_counter": 1,
+    "error_counter": 1,
+    "emergency_counter": 0,
+    "fault_counters": {
+      "ERROR_011_K2_BOILING_TEMP_HIGH": 1
+    }
+  },
+  "last_transition_reason": "ERROR_011_K2_BOILING_TEMP_HIGH"
+}

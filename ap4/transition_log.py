@@ -8,8 +8,6 @@ from .fsm_contract import TransitionRecord
 
 
 class TransitionLogger:
-    """Persistiert Transitionen mit eindeutigen Fehlercodes."""
-
     def __init__(self, path: str | Path) -> None:
         self.path = Path(path)
 

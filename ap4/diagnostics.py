@@ -15,13 +15,6 @@ class Severity(Enum):
 
 @dataclass(frozen=True)
 class Diagnostic:
-    """Ein konkreter, eindeutiger AP4-Fehlernachweis.
-
-    `code` enthält nicht mehr nur eine generische Ursache, sondern einen eindeutigen
-    Fehlerzustand wie `ERROR_005_K1_MASHING_TEMP_LOW`. AP5 und AP6 dürfen diesen
-    Code als stabile Schnittstelle verwenden.
-    """
-
     severity: Severity
     code: FaultCode
     message: str
@@ -62,11 +55,4 @@ def make_diagnostic(
     message: str | None = None,
 ) -> Diagnostic:
     desc = descriptor_for(code)
-    return Diagnostic(
-        severity=severity,
-        code=code,
-        message=message or desc.title,
-        signal=signal,
-        value=value,
-        limit=limit,
-    )
+    return Diagnostic(severity, code, message or desc.title, signal, value, limit)

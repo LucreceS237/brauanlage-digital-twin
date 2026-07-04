@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from .config import EngineeringLimits, LIMITS
 from .diagnostics import Diagnostic, Severity, make_diagnostic
 from .fault_catalog import FaultCode
 from .process_snapshot import ProcessSnapshot
@@ -9,216 +8,68 @@ from .states import BrewState
 
 
 class ProcessMonitor:
-    """Zustandsabhängige Prozessüberwachung für eindeutige ERROR-Codes."""
+    """Prozess- und Guard-Prüfung mit eindeutigen ERROR-Codes."""
 
-    def __init__(self, recipe: BrewRecipe = DEFAULT_RECIPE, limits: EngineeringLimits = LIMITS) -> None:
+    def __init__(self, recipe: BrewRecipe = DEFAULT_RECIPE) -> None:
         self.recipe = recipe
-        self.limits = limits
 
     def evaluate(self, state: BrewState, snapshot: ProcessSnapshot) -> list[Diagnostic]:
-        if state in {BrewState.IDLE, BrewState.PRECHECK, BrewState.FINISHED, BrewState.ERROR, BrewState.EMERGENCY}:
-            return []
-
-        checks = {
-            BrewState.NACHGUSS: self._check_nachguss,
-            BrewState.MASHING: self._check_mashing,
-            BrewState.LAUTERING: self._check_lautering,
-            BrewState.BOILING: self._check_boiling,
-            BrewState.COOLING: self._check_cooling,
-            BrewState.TRANSFER_TO_K4: self._check_transfer_to_k4,
-            BrewState.FERMENTING: self._check_fermenting,
-        }
-
-        return checks.get(state, lambda _s: [])(snapshot)
-
-    def _temperature_window(
-        self,
-        signal: str,
-        value: float,
-        minimum: float,
-        maximum: float,
-        low_code: FaultCode,
-        high_code: FaultCode,
-    ) -> list[Diagnostic]:
-        tol = self.limits.process_temperature_tolerance_c
-
-        if value < minimum - tol:
-            return [make_diagnostic(Severity.ERROR, low_code, signal, value, minimum)]
-
-        if value > maximum + tol:
-            return [make_diagnostic(Severity.ERROR, high_code, signal, value, maximum)]
-
-        return []
-
-    def _check_nachguss(self, snapshot: ProcessSnapshot) -> list[Diagnostic]:
+        r = self.recipe
         diagnostics: list[Diagnostic] = []
+        if snapshot.data_quality.upper() != "GOOD":
+            diagnostics.append(make_diagnostic(Severity.ERROR, FaultCode.ERROR_021_DATA_QUALITY_BAD, "data_quality", snapshot.data_quality, "GOOD"))
+            return diagnostics
 
-        if not snapshot.v3_open:
-            diagnostics.append(
-                make_diagnostic(
-                    Severity.ERROR,
-                    FaultCode.ERROR_003_V3_CLOSED_IN_NACHGUSS,
-                    "v3_open",
-                    False,
-                    True,
-                )
-            )
+        if state == BrewState.NACHGUSS:
+            if snapshot.k1_temperature_c < r.nachguss_temperature_min_c:
+                diagnostics.append(make_diagnostic(Severity.ERROR, FaultCode.ERROR_001_K1_NACHGUSS_TEMP_LOW, "k1_temperature_c", snapshot.k1_temperature_c, r.nachguss_temperature_min_c))
+            if snapshot.k1_temperature_c > r.nachguss_temperature_max_c:
+                diagnostics.append(make_diagnostic(Severity.ERROR, FaultCode.ERROR_002_K1_NACHGUSS_TEMP_HIGH, "k1_temperature_c", snapshot.k1_temperature_c, r.nachguss_temperature_max_c))
+            if not snapshot.v3_open:
+                diagnostics.append(make_diagnostic(Severity.ERROR, FaultCode.ERROR_003_V3_CLOSED_IN_NACHGUSS, "v3_open", False, True))
+            if snapshot.durchfluss_k1_k2_l_min < r.min_nachguss_flow_l_min:
+                diagnostics.append(make_diagnostic(Severity.ERROR, FaultCode.ERROR_004_FLOW_K1_TO_K2_LOW, "durchfluss_k1_k2_l_min", snapshot.durchfluss_k1_k2_l_min, r.min_nachguss_flow_l_min))
 
-        if snapshot.flow_k1_to_k2_l_min < self.recipe.min_nachguss_flow_l_min:
-            diagnostics.append(
-                make_diagnostic(
-                    Severity.ERROR,
-                    FaultCode.ERROR_004_FLOW_K1_TO_K2_LOW,
-                    "flow_k1_to_k2_l_min",
-                    snapshot.flow_k1_to_k2_l_min,
-                    self.recipe.min_nachguss_flow_l_min,
-                )
-            )
+        elif state == BrewState.MASHING:
+            if snapshot.k2_level_l < r.min_k2_mashing_level_l:
+                diagnostics.append(make_diagnostic(Severity.ERROR, FaultCode.ERROR_007_K2_LEVEL_LOW_MASHING, "k2_level_l", snapshot.k2_level_l, r.min_k2_mashing_level_l))
+            if snapshot.k2_temperature_c < r.mashing_temperature_min_c:
+                diagnostics.append(make_diagnostic(Severity.ERROR, FaultCode.ERROR_005_K2_MASHING_TEMP_LOW, "k2_temperature_c", snapshot.k2_temperature_c, r.mashing_temperature_min_c))
+            if snapshot.k2_temperature_c > r.mashing_temperature_max_c:
+                diagnostics.append(make_diagnostic(Severity.ERROR, FaultCode.ERROR_006_K2_MASHING_TEMP_HIGH, "k2_temperature_c", snapshot.k2_temperature_c, r.mashing_temperature_max_c))
 
-        diagnostics.extend(
-            self._temperature_window(
-                "k1_temperature_c",
-                snapshot.k1_temperature_c,
-                self.recipe.nachguss_temperature_min_c,
-                self.recipe.nachguss_temperature_max_c,
-                FaultCode.ERROR_001_K1_NACHGUSS_TEMP_LOW,
-                FaultCode.ERROR_002_K1_NACHGUSS_TEMP_HIGH,
-            )
-        )
+        elif state == BrewState.TRANSFER_TO_K3:
+            if not snapshot.v4_open:
+                diagnostics.append(make_diagnostic(Severity.ERROR, FaultCode.ERROR_008_V4_CLOSED_TRANSFER_K3, "v4_open", False, True))
 
+        elif state == BrewState.LAUTERING:
+            if snapshot.k3_level_l < r.min_k3_lautering_level_l:
+                diagnostics.append(make_diagnostic(Severity.ERROR, FaultCode.ERROR_009_K3_LEVEL_LOW_LAUTERING, "k3_level_l", snapshot.k3_level_l, r.min_k3_lautering_level_l))
+
+        elif state == BrewState.BOILING:
+            if snapshot.k2_level_l < r.min_k2_mashing_level_l:
+                diagnostics.append(make_diagnostic(Severity.ERROR, FaultCode.ERROR_012_K2_LEVEL_LOW_BOILING, "k2_level_l", snapshot.k2_level_l, r.min_k2_mashing_level_l))
+            if snapshot.k2_temperature_c < r.boiling_temperature_min_c:
+                diagnostics.append(make_diagnostic(Severity.ERROR, FaultCode.ERROR_010_K2_BOILING_TEMP_LOW, "k2_temperature_c", snapshot.k2_temperature_c, r.boiling_temperature_min_c))
+            if snapshot.k2_temperature_c > r.boiling_temperature_max_c:
+                diagnostics.append(make_diagnostic(Severity.ERROR, FaultCode.ERROR_011_K2_BOILING_TEMP_HIGH, "k2_temperature_c", snapshot.k2_temperature_c, r.boiling_temperature_max_c))
+
+        elif state == BrewState.COOLING:
+            # Kein sofortiger ERROR nur weil Kühlung noch läuft. ERROR erst wenn Prozess
+            # extern diese Abweichung prüft oder Zeitlimit ergänzt wird.
+            pass
+
+        elif state == BrewState.TRANSFER_TO_K4:
+            if not snapshot.v5_open:
+                diagnostics.append(make_diagnostic(Severity.ERROR, FaultCode.ERROR_014_V5_CLOSED_TRANSFER_K4, "v5_open", False, True))
+            if not snapshot.pump_on:
+                diagnostics.append(make_diagnostic(Severity.ERROR, FaultCode.ERROR_015_PUMP_OFF_TRANSFER_K4, "pump_on", False, True))
+
+        elif state == BrewState.FERMENTING:
+            if snapshot.k4_level_l < r.min_k4_fermentation_level_l:
+                diagnostics.append(make_diagnostic(Severity.ERROR, FaultCode.ERROR_016_K4_LEVEL_LOW_TRANSFER, "k4_level_l", snapshot.k4_level_l, r.min_k4_fermentation_level_l))
+            if snapshot.k4_temperature_c < r.fermentation_temperature_min_c:
+                diagnostics.append(make_diagnostic(Severity.ERROR, FaultCode.ERROR_017_K4_FERMENT_TEMP_LOW, "k4_temperature_c", snapshot.k4_temperature_c, r.fermentation_temperature_min_c))
+            if snapshot.k4_temperature_c > r.fermentation_temperature_max_c:
+                diagnostics.append(make_diagnostic(Severity.ERROR, FaultCode.ERROR_018_K4_FERMENT_TEMP_HIGH, "k4_temperature_c", snapshot.k4_temperature_c, r.fermentation_temperature_max_c))
         return diagnostics
-
-    def _check_mashing(self, snapshot: ProcessSnapshot) -> list[Diagnostic]:
-        diagnostics = self._temperature_window(
-            "k2_temperature_c",
-            snapshot.k2_temperature_c,
-            self.recipe.mashing_temperature_min_c,
-            self.recipe.mashing_temperature_max_c,
-            FaultCode.ERROR_005_K2_MASHING_TEMP_LOW,
-            FaultCode.ERROR_006_K2_MASHING_TEMP_HIGH,
-        )
-
-        if snapshot.k2_level_l < self.recipe.min_k2_mashing_level_l:
-            diagnostics.append(
-                make_diagnostic(
-                    Severity.ERROR,
-                    FaultCode.ERROR_007_K2_LEVEL_LOW_MASHING,
-                    "k2_level_l",
-                    snapshot.k2_level_l,
-                    self.recipe.min_k2_mashing_level_l,
-                )
-            )
-
-        return diagnostics
-
-    def _check_lautering(self, snapshot: ProcessSnapshot) -> list[Diagnostic]:
-        diagnostics: list[Diagnostic] = []
-
-        if not snapshot.v4_open:
-            diagnostics.append(
-                make_diagnostic(
-                    Severity.ERROR,
-                    FaultCode.ERROR_008_V4_CLOSED_IN_LAUTERING,
-                    "v4_open",
-                    False,
-                    True,
-                )
-            )
-
-        if snapshot.flow_k2_to_k3_l_min < self.recipe.min_transfer_flow_l_min:
-            diagnostics.append(
-                make_diagnostic(
-                    Severity.ERROR,
-                    FaultCode.ERROR_009_FLOW_K2_TO_K3_LOW,
-                    "flow_k2_to_k3_l_min",
-                    snapshot.flow_k2_to_k3_l_min,
-                    self.recipe.min_transfer_flow_l_min,
-                )
-            )
-
-        return diagnostics
-
-    def _check_boiling(self, snapshot: ProcessSnapshot) -> list[Diagnostic]:
-        diagnostics = self._temperature_window(
-            "k3_temperature_c",
-            snapshot.k3_temperature_c,
-            self.recipe.boiling_temperature_min_c,
-            self.recipe.boiling_temperature_max_c,
-            FaultCode.ERROR_010_K3_BOILING_TEMP_LOW,
-            FaultCode.ERROR_011_K3_BOILING_TEMP_HIGH,
-        )
-
-        if snapshot.k3_level_l < self.recipe.min_k3_boiling_level_l:
-            diagnostics.append(
-                make_diagnostic(
-                    Severity.ERROR,
-                    FaultCode.ERROR_012_K3_LEVEL_LOW_BOILING,
-                    "k3_level_l",
-                    snapshot.k3_level_l,
-                    self.recipe.min_k3_boiling_level_l,
-                )
-            )
-
-        return diagnostics
-
-    def _check_cooling(self, snapshot: ProcessSnapshot) -> list[Diagnostic]:
-        if snapshot.k3_temperature_c > self.recipe.boiling_temperature_max_c + self.limits.process_temperature_tolerance_c:
-            return [
-                make_diagnostic(
-                    Severity.ERROR,
-                    FaultCode.ERROR_013_COOLING_TEMP_IMPLAUSIBLE,
-                    "k3_temperature_c",
-                    snapshot.k3_temperature_c,
-                    self.recipe.cooling_target_c,
-                )
-            ]
-
-        return []
-
-    def _check_transfer_to_k4(self, snapshot: ProcessSnapshot) -> list[Diagnostic]:
-        diagnostics: list[Diagnostic] = []
-
-        if not snapshot.v5_open:
-            diagnostics.append(
-                make_diagnostic(
-                    Severity.ERROR,
-                    FaultCode.ERROR_014_V5_CLOSED_TRANSFER_K4,
-                    "v5_open",
-                    False,
-                    True,
-                )
-            )
-
-        if not snapshot.pump_on_feedback:
-            diagnostics.append(
-                make_diagnostic(
-                    Severity.ERROR,
-                    FaultCode.ERROR_015_PUMP_OFF_TRANSFER_K4,
-                    "pump_on_feedback",
-                    False,
-                    True,
-                )
-            )
-
-        if snapshot.flow_k3_to_k4_l_min < self.recipe.min_transfer_flow_l_min:
-            diagnostics.append(
-                make_diagnostic(
-                    Severity.ERROR,
-                    FaultCode.ERROR_016_FLOW_K3_TO_K4_LOW,
-                    "flow_k3_to_k4_l_min",
-                    snapshot.flow_k3_to_k4_l_min,
-                    self.recipe.min_transfer_flow_l_min,
-                )
-            )
-
-        return diagnostics
-
-    def _check_fermenting(self, snapshot: ProcessSnapshot) -> list[Diagnostic]:
-        return self._temperature_window(
-            "k4_temperature_c",
-            snapshot.k4_temperature_c,
-            self.recipe.fermentation_temperature_min_c,
-            self.recipe.fermentation_temperature_max_c,
-            FaultCode.ERROR_017_K4_FERMENT_TEMP_LOW,
-            FaultCode.ERROR_018_K4_FERMENT_TEMP_HIGH,
-        )

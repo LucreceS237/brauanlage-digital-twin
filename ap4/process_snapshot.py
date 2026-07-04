@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
+from datetime import datetime, timezone
 from typing import Any, Mapping
 
 
 def _float(values: Mapping[str, Any], name: str, default: float = 0.0) -> float:
     value = values.get(name, default)
-    if value is None:
+    if value in (None, ""):
         return default
     try:
         return float(value)
@@ -20,27 +21,52 @@ def _bool(values: Mapping[str, Any], name: str, default: bool = False) -> bool:
         return value
     if isinstance(value, (int, float)):
         return bool(value)
-    return str(value).strip().lower() in {"true", "1", "ja", "yes", "on"}
+    text = str(value).strip().lower()
+    if text in {"true", "1", "ja", "yes", "on"}:
+        return True
+    if text in {"false", "0", "nein", "no", "off"}:
+        return False
+    return default
 
 
 def _int(values: Mapping[str, Any], name: str, default: int = 0) -> int:
     value = values.get(name, default)
-    if value is None:
+    if value in (None, ""):
         return default
     try:
-        return int(value)
+        return int(float(value))
     except (TypeError, ValueError):
         return default
 
 
+def _str(values: Mapping[str, Any], name: str, default: str = "") -> str:
+    value = values.get(name, default)
+    if value is None:
+        return default
+    return str(value)
+
+
+def _timestamp_to_seconds(timestamp: str) -> float:
+    if not timestamp:
+        return 0.0
+    try:
+        text = timestamp.replace("Z", "+00:00")
+        return datetime.fromisoformat(text).timestamp()
+    except ValueError:
+        return 0.0
+
+
 @dataclass(frozen=True)
 class ProcessSnapshot:
-    """Normiertes Prozessabbild aus AP3.
+    """Normiertes AP4-Prozessabbild pro Timestamp.
 
-    AP4 verarbeitet ausschließlich kanonische Signale, keine OPC-UA-NodeIds.
-    Dadurch sind Simulation, Replay und Live-Betrieb identisch testbar.
+    Diese Klasse ist die Laufzeitschnittstelle AP3 -> AP4. AP3 liefert CSV,
+    SQLite, MQTT oder Live-Werte. AP4 normiert sie auf genau diese Signale.
+    Der Snapshot folgt dem vom Benutzer vorgegebenen Format: Es gibt nur einen
+    gemessenen Durchfluss, nämlich K1 -> K2.
     """
 
+    timestamp: str = ""
     timestamp_s: float = 0.0
     aktueller_schritt: int = 0
     start_requested: bool = False
@@ -48,103 +74,117 @@ class ProcessSnapshot:
     reset_requested: bool = False
     emergency_stop: bool = False
     sensor_ok: bool = True
+    data_quality: str = "GOOD"
 
+    # K1 = Nachgussbehälter
     k1_temperature_c: float = 78.0
-    k1_level_l: float = 10.0
-    k1_level_min: bool = False
-    k1_level_max: bool = False
+    k1_level_l: float = 20.0
 
-    k2_temperature_c: float = 65.0
+    # K2 = Maische-/Kochbehälter
+    k2_temperature_c: float = 20.0
     k2_level_l: float = 0.0
-    k2_level_full: bool = False
 
+    # K3 = Läuterbehälter
     k3_temperature_c: float = 20.0
     k3_level_l: float = 0.0
-    k3_level_full: bool = False
 
+    # K4 = Gärbehälter
     k4_temperature_c: float = 20.0
     k4_level_l: float = 0.0
 
-    flow_k1_to_k2_l_min: float = 0.0
-    flow_k2_to_k3_l_min: float = 0.0
-    flow_k3_to_k4_l_min: float = 0.0
+    # Einziger gemessener Durchfluss: K1 -> K2
+    durchfluss_k1_k2_l_min: float = 0.0
 
     v3_open: bool = False
     v4_open: bool = False
     v5_open: bool = False
-    nv1_closed: bool = True
-    nv2_closed: bool = True
-    nv3_closed: bool = True
-
-    heater_k2_on_feedback: bool = False
-    heater_k3_on_feedback: bool = False
-    agitator_on_feedback: bool = False
-    pump_on_feedback: bool = False
+    pump_on: bool = False
 
     missing_value_age_s: float = 0.0
 
     @classmethod
-    def from_opc_values(cls, values: Mapping[str, Any]) -> "ProcessSnapshot":
+    def from_dict(cls, values: Mapping[str, Any]) -> "ProcessSnapshot":
+        """Erzeugt einen Snapshot aus CSV-/SQLite-/AP3-Daten.
+
+        Unterstützt deutsche AP3-Feldnamen wie `k1_temperatur` und interne
+        Feldnamen wie `k1_temperature_c`. Dadurch bleibt AP4 robust gegenüber
+        unterschiedlichen AP3-Exportformaten.
+        """
         aliases = dict(values)
+        # Deutsche AP3-Signale -> kanonische AP4-Felder
+        mapping = {
+            "k1_temperatur": "k1_temperature_c",
+            "k1_fuellstand": "k1_level_l",
+            "k2_temperatur": "k2_temperature_c",
+            "k2_fuellstand": "k2_level_l",
+            "k3_temperatur": "k3_temperature_c",
+            "k3_fuellstand": "k3_level_l",
+            "k4_temperatur": "k4_temperature_c",
+            "k4_fuellstand": "k4_level_l",
+            "durchfluss_k1_k2": "durchfluss_k1_k2_l_min",
+            "durchfluss_nachguss_maische": "durchfluss_k1_k2_l_min",
+            "pump_on_feedback": "pump_on",
+        }
+        for src, dst in mapping.items():
+            if src in aliases and dst not in aliases:
+                aliases[dst] = aliases[src]
 
-        if "k1_temperatur" in aliases:
-            aliases.setdefault("k1_temperature_c", aliases["k1_temperatur"])
+        timestamp = _str(aliases, "timestamp")
+        timestamp_s = _float(aliases, "timestamp_s", _timestamp_to_seconds(timestamp))
 
-        if "k2_temperatur" in aliases:
-            aliases.setdefault("k2_temperature_c", aliases["k2_temperatur"])
-
-        if "k3_temperatur" in aliases:
-            aliases.setdefault("k3_temperature_c", aliases["k3_temperatur"])
-
-        if "mobiler_sensor_temperatur" in aliases:
-            aliases.setdefault("k4_temperature_c", aliases["mobiler_sensor_temperatur"])
-
-        if "durchfluss_nachguss_maische" in aliases:
-            aliases.setdefault("flow_k1_to_k2_l_min", aliases["durchfluss_nachguss_maische"])
+        # Wenn AP3 nur aktueller_schritt liefert, kann AP4 damit den Start ableiten.
+        start_requested = _bool(aliases, "start_requested", _int(aliases, "aktueller_schritt") > 0)
 
         return cls(
-            timestamp_s=_float(aliases, "timestamp_s"),
+            timestamp=timestamp,
+            timestamp_s=timestamp_s,
             aktueller_schritt=_int(aliases, "aktueller_schritt"),
-            start_requested=_bool(aliases, "start_requested"),
+            start_requested=start_requested,
             acknowledge=_bool(aliases, "acknowledge"),
             reset_requested=_bool(aliases, "reset_requested"),
             emergency_stop=_bool(aliases, "emergency_stop"),
             sensor_ok=_bool(aliases, "sensor_ok", True),
-
+            data_quality=_str(aliases, "data_quality", "GOOD").upper(),
             k1_temperature_c=_float(aliases, "k1_temperature_c", 78.0),
-            k1_level_l=_float(aliases, "k1_level_l", _float(aliases, "k1_fuellstand", 10.0)),
-            k1_level_min=_bool(aliases, "k1_level_min", _bool(aliases, "k1_minimaler_fuellstand")),
-            k1_level_max=_bool(aliases, "k1_level_max", _bool(aliases, "k1_maximaler_fuellstand")),
-
-            k2_temperature_c=_float(aliases, "k2_temperature_c", 65.0),
-            k2_level_l=_float(aliases, "k2_level_l", _float(aliases, "k2_fuellstand", 0.0)),
-            k2_level_full=_bool(aliases, "k2_level_full", _bool(aliases, "k2_fuellstand_voll")),
-
+            k1_level_l=_float(aliases, "k1_level_l", 20.0),
+            k2_temperature_c=_float(aliases, "k2_temperature_c", 20.0),
+            k2_level_l=_float(aliases, "k2_level_l", 0.0),
             k3_temperature_c=_float(aliases, "k3_temperature_c", 20.0),
-            k3_level_l=_float(aliases, "k3_level_l", _float(aliases, "k3_fuellstand", 0.0)),
-            k3_level_full=_bool(aliases, "k3_level_full", _bool(aliases, "k3_fuellstand_voll")),
-
+            k3_level_l=_float(aliases, "k3_level_l", 0.0),
             k4_temperature_c=_float(aliases, "k4_temperature_c", 20.0),
             k4_level_l=_float(aliases, "k4_level_l", 0.0),
-
-            flow_k1_to_k2_l_min=_float(aliases, "flow_k1_to_k2_l_min"),
-            flow_k2_to_k3_l_min=_float(aliases, "flow_k2_to_k3_l_min"),
-            flow_k3_to_k4_l_min=_float(aliases, "flow_k3_to_k4_l_min"),
-
+            durchfluss_k1_k2_l_min=_float(aliases, "durchfluss_k1_k2_l_min"),
             v3_open=_bool(aliases, "v3_open"),
             v4_open=_bool(aliases, "v4_open"),
             v5_open=_bool(aliases, "v5_open"),
-            nv1_closed=_bool(aliases, "nv1_closed", True),
-            nv2_closed=_bool(aliases, "nv2_closed", True),
-            nv3_closed=_bool(aliases, "nv3_closed", True),
-
-            heater_k2_on_feedback=_bool(aliases, "heater_k2_on_feedback"),
-            heater_k3_on_feedback=_bool(aliases, "heater_k3_on_feedback"),
-            agitator_on_feedback=_bool(aliases, "agitator_on_feedback"),
-            pump_on_feedback=_bool(aliases, "pump_on_feedback"),
-
+            pump_on=_bool(aliases, "pump_on"),
             missing_value_age_s=_float(aliases, "missing_value_age_s"),
         )
 
     def with_updates(self, **changes: Any) -> "ProcessSnapshot":
         return replace(self, **changes)
+
+    def to_ap3_like_dict(self) -> dict[str, Any]:
+        """Exportiert die Werte in der Form, die im Bild vorgegeben wurde."""
+        return {
+            "timestamp": self.timestamp,
+            "aktueller_schritt": self.aktueller_schritt,
+            "k1_temperatur": self.k1_temperature_c,
+            "k1_fuellstand": self.k1_level_l,
+            "k2_temperatur": self.k2_temperature_c,
+            "k2_fuellstand": self.k2_level_l,
+            "k3_temperatur": self.k3_temperature_c,
+            "k3_fuellstand": self.k3_level_l,
+            "k4_temperatur": self.k4_temperature_c,
+            "k4_fuellstand": self.k4_level_l,
+            "durchfluss_k1_k2": self.durchfluss_k1_k2_l_min,
+            "v3_open": self.v3_open,
+            "v4_open": self.v4_open,
+            "v5_open": self.v5_open,
+            "pump_on": self.pump_on,
+            "emergency_stop": self.emergency_stop,
+            "sensor_ok": self.sensor_ok,
+            "data_quality": self.data_quality,
+            "start_requested": self.start_requested,
+            "acknowledge": self.acknowledge,
+        }

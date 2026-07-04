@@ -4,19 +4,23 @@ from enum import Enum
 
 
 class BrewState(Enum):
-    """Diskrete Superzustände des AP4-Zustandsautomaten.
+    """Diskrete Zustände des AP4-Zustandsautomaten.
 
-    Version 4 nutzt bewusst eine zweistufige Fehlerarchitektur:
-    - `BrewState.ERROR` und `BrewState.EMERGENCY` bleiben steuerungstechnische
-      Superzustände. Dadurch bleibt die FSM stabil und beherrschbar.
-    - Der konkrete Fehler wird über `FaultCode` und `FsmContext.display_state`
-      abgebildet, z. B. `ERROR_005_K1_MASHING_TEMP_LOW`.
+    Equipment-Zuordnung Version 5:
+    - K1 = Nachgussbehälter
+    - K2 = Maische-/Kochbehälter
+    - K3 = Läuterbehälter
+    - K4 = Gärbehälter
+
+    Hinweis: ERROR und EMERGENCY bleiben steuerungstechnische Superzustände.
+    Der konkrete Fehler wird über FaultCode/display_state ausgegeben.
     """
 
     IDLE = "idle"
     PRECHECK = "precheck"
     NACHGUSS = "nachguss"
     MASHING = "mashing"
+    TRANSFER_TO_K3 = "transfer_to_k3"
     LAUTERING = "lautering"
     BOILING = "boiling"
     COOLING = "cooling"
@@ -31,6 +35,7 @@ class BrewState(Enum):
         return self in {
             BrewState.NACHGUSS,
             BrewState.MASHING,
+            BrewState.TRANSFER_TO_K3,
             BrewState.LAUTERING,
             BrewState.BOILING,
             BrewState.COOLING,
@@ -48,6 +53,7 @@ NORMAL_SEQUENCE: tuple[BrewState, ...] = (
     BrewState.PRECHECK,
     BrewState.NACHGUSS,
     BrewState.MASHING,
+    BrewState.TRANSFER_TO_K3,
     BrewState.LAUTERING,
     BrewState.BOILING,
     BrewState.COOLING,
@@ -63,4 +69,5 @@ FORBIDDEN_DIRECT_TRANSITIONS: set[tuple[BrewState, BrewState]] = {
     (BrewState.COOLING, BrewState.MASHING),
     (BrewState.FERMENTING, BrewState.BOILING),
     (BrewState.LAUTERING, BrewState.NACHGUSS),
+    (BrewState.NACHGUSS, BrewState.BOILING),
 }

@@ -5,23 +5,25 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class BrewRecipe:
-    """Rezept- und Prozessparameter für AP4.
+    """Engineering-Rezept für AP4-Simulation und Terminalabnahme.
 
-    Die Werte sind Engineering-Arbeitswerte. Für die reale Laboranlage müssen
-    endgültige Rezeptparameter und empirisch validierte Grenzwerte ergänzt werden.
+    Die Werte sind bewusst kurz gewählt, damit der gesamte Prozess im Terminal
+    reproduzierbar getestet werden kann. In der realen Anlage werden die Werte
+    durch Rezeptdaten bzw. Laborparameter ersetzt.
     """
 
-    nachguss_min_duration_s: float = 60.0
-    mashing_duration_s: float = 60.0 * 45.0
-    lautering_duration_s: float = 60.0 * 20.0
-    boiling_duration_s: float = 60.0 * 30.0
-    transfer_to_k4_duration_s: float = 60.0 * 5.0
-    fermentation_duration_s: float = 60.0 * 60.0 * 24.0 * 5.0
+    nachguss_min_duration_s: float = 120.0
+    mashing_duration_s: float = 180.0
+    transfer_to_k3_duration_s: float = 60.0
+    lautering_duration_s: float = 120.0
+    boiling_duration_s: float = 180.0
+    transfer_to_k4_duration_s: float = 60.0
+    fermentation_duration_s: float = 180.0
 
-    min_k3_start_level_l: float = 5.0
-    min_k1_mashing_level_l: float = 3.0
-    min_k2_boiling_level_l: float = 3.0
-    min_k4_fermentation_level_l: float = 2.0
+    min_k1_start_level_l: float = 10.0
+    min_k2_mashing_level_l: float = 15.0
+    min_k3_lautering_level_l: float = 10.0
+    min_k4_fermentation_level_l: float = 10.0
 
     nachguss_temperature_min_c: float = 70.0
     nachguss_temperature_max_c: float = 82.0
@@ -34,7 +36,6 @@ class BrewRecipe:
     fermentation_temperature_max_c: float = 22.0
 
     min_nachguss_flow_l_min: float = 0.5
-    min_transfer_flow_l_min: float = 0.5
 
 
 DEFAULT_RECIPE = BrewRecipe()

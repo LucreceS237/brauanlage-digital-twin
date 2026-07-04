@@ -1,0 +1,27 @@
+{
+  "consumer": "AP5_Anomalieerkennung",
+  "state": "mashing",
+  "display_state": "MASHING",
+  "time_in_state_s": 0.0,
+  "active_fault_code": null,
+  "active_fault_title": null,
+  "active_fault_signal": null,
+  "active_fault_value": null,
+  "active_fault_limit": null,
+  "diagnostics": [],
+  "expected_outputs": {
+    "heater_k2_on": true,
+    "agitator_on": true,
+    "pump_on": false,
+    "v3_open": false,
+    "v4_open": false,
+    "v5_open": false
+  },
+  "metrics": {
+    "transition_counter": 3,
+    "error_counter": 0,
+    "emergency_counter": 0,
+    "fault_counters": {}
+  },
+  "last_transition_reason": "NACHGUSS_COMPLETE"
+}
