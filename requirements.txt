@@ -1,4 +1,4 @@
 flask
-asyncua
-python-dotenv
-pytest
+flask-cors
+pandas
+gunicorn

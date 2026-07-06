@@ -1,215 +1,98 @@
-from flask import Flask, jsonify, render_template
-import sqlite3
-import asyncio
-from asyncua import Client
-import logging
-import paho.mqtt.publish as publish
-
-temp = 67
-
-publish.single(
-    "brewery/temperature/mash",
-    str(temp),
-    hostname="localhost"
-)
-
-def publish_temperature(temp):
-
-    publish.single(
-        "brewery/temperature/mash",
-        str(temp),
-        hostname="localhost"
-    )
-
-    print("MQTT Temperatur gesendet:", temp)
-
-logging.basicConfig(level=logging.INFO)
-logging.info("Server started")
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+import pandas as pd
+import os
 
 app = Flask(__name__)
+CORS(app)
 
-# =========================
-# OPC-UA
-# =========================
-
-url = "opc.tcp://192.168.0.1:4840"
+CSV_FILE = "data.csv"
 
 
-async def read_opcua_data():
+@app.route("/api/status", methods=["GET"])
+def api_status():
 
-    async with Client(url=url) as client:
+    if not os.path.exists(CSV_FILE):
+        return jsonify({"error": "CSV file not found"}), 404
 
-        print("Verbindung erfolgreich")
+    df = pd.read_csv(CSV_FILE)
 
-        temp_node = client.get_node(
-            'ns=3;s="AL1401_X1_Temperatursensor_Gärung"."Temperatur"'
-        )
+    if df.empty:
+        return jsonify({"error": "CSV is empty"}), 404
 
-        temp = await temp_node.read_value()
+    last = df.iloc[-1]
 
-        return temp
+    response = {
+        # ===== Données CSV =====
+        "timestamp": last["timestamp"],
+        "k1_temperatur": float(last["k1_temperatur"]),
+        "k2_temperatur": float(last["k2_temperatur"]),
+        "k3_temperatur": float(last["k3_temperatur"]),
+        "k2_fuellstand": float(last["k2_fuellstand"]),
+        "k3_fuellstand": float(last["k3_fuellstand"]),
+        "durchfluss": float(last["durchfluss"]),
+        "aktueller_schritt": int(last["aktueller_schritt"]),
+        "alarm": bool(last["alarm"]),
 
-# =========================
-# DATABASE
-# =========================
+        # ===== Champs compatibles Dashboard =====
+        "k1Temperature": float(last["k1_temperatur"]),
+        "k2Temperature": float(last["k2_temperatur"]),
+        "k3Temperature": float(last["k3_temperatur"]),
 
+        "k2Level": float(last["k2_fuellstand"]),
+        "k3Level": float(last["k3_fuellstand"]),
 
-def init_db():
-    conn = sqlite3.connect("database.db")
-    cursor = conn.cursor()
+        "flowRate": float(last["durchfluss"]),
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS data (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        temperature REAL,
-        phase TEXT, 
-        alarm INTEGER
-    )
-    """)
+        "currentStep": int(last["aktueller_schritt"]),
 
-    conn.commit()
-    conn.close()
+        "phase": "Maischen",
 
+        "alarmStatus": bool(last["alarm"]),
 
-def save_data(temp, phase, alarm):
-    conn = sqlite3.connect("database.db")
-    cursor = conn.cursor()
+        "backend": "online"
+    }
 
-    cursor.execute(
-        "INSERT INTO data (temperature, phase, alarm) VALUES (?, ?, ?)",
-        (temp, phase, alarm)
-    )
-
-    conn.commit()
-    conn.close()
+    return jsonify(response)
 
 
-# =========================
-# ANOMALY
-# =========================
+@app.route("/api/history", methods=["GET"])
+def api_history():
 
-def check_anomaly(temp):
+    if not os.path.exists(CSV_FILE):
+        return jsonify([])
 
-    if temp > 75:
-        return True
+    df = pd.read_csv(CSV_FILE)
 
-    return False
-
-
-# =========================
-# INIT
-# =========================
-
-init_db()
-
-# test data
-
-try:
-
-    temp = asyncio.run(read_opcua_data())
-
-    phase = "Kochen"
-
-    alarm = check_anomaly(temp)
-
-    save_data(temp, phase, alarm)
-
-except Exception as e:
-
-    print("OPC-UA Error:", e)
+    return jsonify(df.to_dict(orient="records"))
 
 
-# =========================
-# API STATUS
-# =========================
+@app.route("/api/control", methods=["POST"])
+def api_control():
 
-@app.route("/api/status")
-def status():
+    data = request.json
 
-    conn = sqlite3.connect("database.db")
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT * FROM data ORDER BY id DESC LIMIT 1")
-
-    row = cursor.fetchone()
-
-    conn.close()
-
-    if row:
-        return jsonify({
-            "temperature": row[1],
-
-            "phase": row[2],
-
-            "pump": True,
-
-            "valve": False,
-
-            "alarm": bool(row[3])
-        })
-
-    return jsonify({"message": "no data"})
+    return jsonify({
+        "success": True,
+        "message": "Control command received",
+        "received": data
+    })
 
 
-# =========================
-# DASHBOARD
-# =========================
+@app.route("/", methods=["GET"])
+def home():
 
-@app.route("/")
-def dashboard():
-
-    conn = sqlite3.connect("database.db")
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT * FROM data ORDER BY id DESC LIMIT 1")
-
-    row = cursor.fetchone()
-
-    conn.close()
-
-    if row:
-        data = {
-            "temperature": row[1],
-            "phase": row[2],
-            "alarm": bool(row[3])
+    return jsonify({
+        "message": "Brauanlage Flask API läuft",
+        "status": "online",
+        "endpoints": {
+            "status": "/api/status",
+            "history": "/api/history",
+            "control": "/api/control"
         }
+    })
 
-        return render_template("dashboard.html", data=data)
 
-    return "No data"
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
 
-@app.route("/history")
-def history_page():
-
-    conn = sqlite3.connect("database.db")
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT * FROM data")
-
-    rows = cursor.fetchall()
-
-    conn.close()
-
-    return render_template("history.html", rows=rows)
-
-@app.route("/api/alarm")
-def alarm():
-
-    conn = sqlite3.connect("database.db")
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT * FROM data ORDER BY id DESC LIMIT 1")
-
-    row = cursor.fetchone()
-
-    conn.close()
-
-    if row:
-
-        return jsonify({
-            "alarm": bool(row[3])
-        })
-
-    return jsonify({"alarm": False})
-
-app.run(host="0.0.0.0", port=5000, debug=True)

@@ -1,75 +1,72 @@
 <!DOCTYPE html>
-<html>
+<html lang="de">
 <head>
-    
-    <meta http-equiv="refresh" content="5">
-    <title>Brauanlage Dashboard</title>
+  <meta charset="UTF-8">
+  <title>Brauanlage Live-Anzeige</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111827;
+      color: white;
+      padding: 30px;
+    }
 
-    <style>
-        body {
-            font-family: Arial;
-            background-color: #f4f4f4;
-            text-align: center;
-            padding-top: 50px;
-        }
+    .card {
+      background: #1f2937;
+      padding: 20px;
+      margin: 15px 0;
+      border-radius: 12px;
+    }
 
-        .card {
-            background: white;
-            width: 400px;
-            margin: auto;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+    .ok {
+      color: #22c55e;
+    }
 
-	}
-
-        .temp {
-            font-size: 40px;
-            margin: 20px;
-        }
-
-        .alarm {
-            color: red;
-            font-weight: bold;
-        }
-
-        .ok {
-            color: green;
-            font-weight: bold;
-        }	
-
-    </style>
-
+    .alarm {
+      color: #ef4444;
+    }
+  </style>
 </head>
 <body>
 
-    <div class="card">
+  <h1>Digitaler Zwilling – Brauanlage</h1>
 
-	
-<button onclick="location.reload()">
-    Refresh Data
-</button>   
+  <div class="card">
+    <h2>Status: <span id="connection">---</span></h2>
+    <p>Zeit: <span id="timestamp">---</span></p>
+    <p>Prozessphase: <span id="phase">---</span></p>
+    <p>Temperatur: <span id="temperature">---</span> °C</p>
+    <p>Pumpe 1: <span id="pump">---</span></p>
+    <p>Ventil 1: <span id="valve">---</span></p>
+    <p>Alarm: <span id="alarm">---</span></p>
+  </div>
 
-        <h1>🍺 Brauanlage Dashboard</h1>
+  <script>
+    async function loadStatus() {
+      try {
+        const response = await fetch("/api/status");
+        const data = await response.json();
 
-        <div class="temp"
-     style="color: {% if data.temperature > 75 %} red {% else %} green {% endif %}; transition: 0.5s;
-    ">
-            🌡️ {{ data.temperature }} °C
-        </div>
+        document.getElementById("timestamp").textContent = data.timestamp;
+        document.getElementById("connection").textContent = data.connection_status;
+        document.getElementById("phase").textContent = data.process_phase;
+        document.getElementById("temperature").textContent = data.temperature;
+        document.getElementById("pump").textContent = data.pump_1 ? "Ein" : "Aus";
+        document.getElementById("valve").textContent = data.valve_1 ? "Offen" : "Geschlossen";
 
-        <h2>
-            Phase: {{ data.phase }}
-        </h2>
+        const alarmElement = document.getElementById("alarm");
+        alarmElement.textContent = data.alarm ? "Alarm" : "OK";
+        alarmElement.className = data.alarm ? "alarm" : "ok";
 
-        {% if data.alarm %}
-            <p class="alarm">⚠️ ALARM AKTIV</p>
-        {% else %}
-            <p class="ok">✅ System OK</p>
-        {% endif %}
+      } catch (error) {
+        document.getElementById("connection").textContent = "offline";
+        document.getElementById("connection").className = "alarm";
+      }
+    }
 
-    </div>
-
+    loadStatus();
+    setInterval(loadStatus, 2000);
+  </script>
 
 </body>
 </html>
