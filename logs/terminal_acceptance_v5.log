@@ -1,0 +1,169 @@
+AP4 Terminal-Abnahme Version 5
+================================================================================
+
+T01 - Start -> PRECHECK
+Übergang: IDLE -> PRECHECK
+Jetzt ist Zustand: PRECHECK
+Grund: START_REQUESTED - Startanforderung aus AP3/Bedienung erhalten.
+Geändert: JA
+Status: BESTANDEN
+
+T02 - Precheck K1 OK -> NACHGUSS
+Übergang: PRECHECK -> NACHGUSS
+Jetzt ist Zustand: NACHGUSS
+Grund: PRECHECK_OK - K1 Nachgussbehälter bereit. Nachguss K1->K2 startet.
+Geändert: JA
+Status: BESTANDEN
+
+T03 - K1->K2 Nachguss fertig -> MASHING
+Übergang: NACHGUSS -> MASHING
+Jetzt ist Zustand: MASHING
+Grund: NACHGUSS_COMPLETE - K2 hat genügend Nachguss/Maische. Maischen wird freigegeben.
+Geändert: JA
+Status: BESTANDEN
+
+T04 - Maischen in K2 fertig -> TRANSFER_TO_K3
+Übergang: MASHING -> TRANSFER_TO_K3
+Jetzt ist Zustand: TRANSFER_TO_K3
+Grund: MASHING_COMPLETE - Maischen in K2 abgeschlossen. Transfer zum Läuterbehälter K3 wird freigegeben.
+Geändert: JA
+Status: BESTANDEN
+
+T05 - Transfer K2->K3 fertig -> LAUTERING
+Übergang: TRANSFER_TO_K3 -> LAUTERING
+Jetzt ist Zustand: LAUTERING
+Grund: TRANSFER_TO_K3_COMPLETE - K3 enthält genügend Würze/Maische. Läutern startet.
+Geändert: JA
+Status: BESTANDEN
+
+T06 - Läutern in K3 fertig -> BOILING
+Übergang: LAUTERING -> BOILING
+Jetzt ist Zustand: BOILING
+Grund: LAUTERING_COMPLETE - Läutern abgeschlossen. Kochphase in K2 wird freigegeben.
+Geändert: JA
+Status: BESTANDEN
+
+T07 - Kochen in K2 fertig -> COOLING
+Übergang: BOILING -> COOLING
+Jetzt ist Zustand: COOLING
+Grund: BOILING_COMPLETE - Kochen abgeschlossen. Kühlung startet.
+Geändert: JA
+Status: BESTANDEN
+
+T08 - Kühlziel erreicht -> TRANSFER_TO_K4
+Übergang: COOLING -> TRANSFER_TO_K4
+Jetzt ist Zustand: TRANSFER_TO_K4
+Grund: COOLING_COMPLETE - Kühlziel erreicht. Transfer nach K4 wird freigegeben.
+Geändert: JA
+Status: BESTANDEN
+
+T09 - Transfer K4 fertig -> FERMENTING
+Übergang: TRANSFER_TO_K4 -> FERMENTING
+Jetzt ist Zustand: FERMENTING
+Grund: TRANSFER_TO_K4_COMPLETE - K4 enthält genügend Jungbier. Gärung beginnt.
+Geändert: JA
+Status: BESTANDEN
+
+T10 - Gärung fertig -> FINISHED
+Übergang: FERMENTING -> FINISHED
+Jetzt ist Zustand: FINISHED
+Grund: FERMENTATION_COMPLETE - Gärung abgeschlossen. Prozess beendet.
+Geändert: JA
+Status: BESTANDEN
+
+Normalpfad: 10/10 bestanden
+
+AP4 Fehlercode-Abnahme Version 5
+================================================================================
+
+F01 erwartet: ERROR_001_K1_NACHGUSS_TEMP_LOW
+Übergang: NACHGUSS -> ERROR_001_K1_NACHGUSS_TEMP_LOW
+Jetzt ist Zustand: ERROR_001_K1_NACHGUSS_TEMP_LOW
+Grund: ERROR_001_K1_NACHGUSS_TEMP_LOW - K1-Nachgusstemperatur zu niedrig
+Geändert: JA
+Aktiver Fehlerzustand: ERROR_001_K1_NACHGUSS_TEMP_LOW
+Fehlertitel: K1-Nachgusstemperatur zu niedrig
+[ERROR] ERROR_001_K1_NACHGUSS_TEMP_LOW: K1-Nachgusstemperatur zu niedrig | signal=k1_temperature_c, value=50, limit=70.0
+Status: BESTANDEN
+
+F02 erwartet: ERROR_003_V3_CLOSED_IN_NACHGUSS
+Übergang: NACHGUSS -> ERROR_003_V3_CLOSED_IN_NACHGUSS
+Jetzt ist Zustand: ERROR_003_V3_CLOSED_IN_NACHGUSS
+Grund: ERROR_003_V3_CLOSED_IN_NACHGUSS - V3 im Nachguss geschlossen
+Geändert: JA
+Aktiver Fehlerzustand: ERROR_003_V3_CLOSED_IN_NACHGUSS
+Fehlertitel: V3 im Nachguss geschlossen
+[ERROR] ERROR_003_V3_CLOSED_IN_NACHGUSS: V3 im Nachguss geschlossen | signal=v3_open, value=False, limit=True
+Status: BESTANDEN
+
+F03 erwartet: ERROR_004_FLOW_K1_TO_K2_LOW
+Übergang: NACHGUSS -> ERROR_004_FLOW_K1_TO_K2_LOW
+Jetzt ist Zustand: ERROR_004_FLOW_K1_TO_K2_LOW
+Grund: ERROR_004_FLOW_K1_TO_K2_LOW - Durchfluss K1->K2 zu niedrig
+Geändert: JA
+Aktiver Fehlerzustand: ERROR_004_FLOW_K1_TO_K2_LOW
+Fehlertitel: Durchfluss K1->K2 zu niedrig
+[ERROR] ERROR_004_FLOW_K1_TO_K2_LOW: Durchfluss K1->K2 zu niedrig | signal=durchfluss_k1_k2_l_min, value=0.0, limit=0.5
+Status: BESTANDEN
+
+F04 erwartet: ERROR_005_K2_MASHING_TEMP_LOW
+Übergang: MASHING -> ERROR_005_K2_MASHING_TEMP_LOW
+Jetzt ist Zustand: ERROR_005_K2_MASHING_TEMP_LOW
+Grund: ERROR_005_K2_MASHING_TEMP_LOW - K2-Maischtemperatur zu niedrig
+Geändert: JA
+Aktiver Fehlerzustand: ERROR_005_K2_MASHING_TEMP_LOW
+Fehlertitel: K2-Maischtemperatur zu niedrig
+[ERROR] ERROR_005_K2_MASHING_TEMP_LOW: K2-Maischtemperatur zu niedrig | signal=k2_temperature_c, value=40, limit=62.0
+Status: BESTANDEN
+
+F05 erwartet: ERROR_008_V4_CLOSED_TRANSFER_K3
+Übergang: TRANSFER_TO_K3 -> ERROR_008_V4_CLOSED_TRANSFER_K3
+Jetzt ist Zustand: ERROR_008_V4_CLOSED_TRANSFER_K3
+Grund: ERROR_008_V4_CLOSED_TRANSFER_K3 - V4 beim Transfer nach K3 geschlossen
+Geändert: JA
+Aktiver Fehlerzustand: ERROR_008_V4_CLOSED_TRANSFER_K3
+Fehlertitel: V4 beim Transfer nach K3 geschlossen
+[ERROR] ERROR_008_V4_CLOSED_TRANSFER_K3: V4 beim Transfer nach K3 geschlossen | signal=v4_open, value=False, limit=True
+Status: BESTANDEN
+
+F06 erwartet: ERROR_011_K2_BOILING_TEMP_HIGH
+Übergang: BOILING -> ERROR_011_K2_BOILING_TEMP_HIGH
+Jetzt ist Zustand: ERROR_011_K2_BOILING_TEMP_HIGH
+Grund: ERROR_011_K2_BOILING_TEMP_HIGH - K2-Kochtemperatur zu hoch
+Geändert: JA
+Aktiver Fehlerzustand: ERROR_011_K2_BOILING_TEMP_HIGH
+Fehlertitel: K2-Kochtemperatur zu hoch
+[ERROR] ERROR_011_K2_BOILING_TEMP_HIGH: K2-Kochtemperatur zu hoch | signal=k2_temperature_c, value=110, limit=102.0
+Status: BESTANDEN
+
+F07 erwartet: ERROR_018_K4_FERMENT_TEMP_HIGH
+Übergang: FERMENTING -> ERROR_018_K4_FERMENT_TEMP_HIGH
+Jetzt ist Zustand: ERROR_018_K4_FERMENT_TEMP_HIGH
+Grund: ERROR_018_K4_FERMENT_TEMP_HIGH - K4-Gärtemperatur zu hoch
+Geändert: JA
+Aktiver Fehlerzustand: ERROR_018_K4_FERMENT_TEMP_HIGH
+Fehlertitel: K4-Gärtemperatur zu hoch
+[ERROR] ERROR_018_K4_FERMENT_TEMP_HIGH: K4-Gärtemperatur zu hoch | signal=k4_temperature_c, value=30, limit=22.0
+Status: BESTANDEN
+
+F08 erwartet: EMERGENCY_001_ESTOP_ACTIVE
+Übergang: BOILING -> EMERGENCY_001_ESTOP_ACTIVE
+Jetzt ist Zustand: EMERGENCY_001_ESTOP_ACTIVE
+Grund: EMERGENCY_001_ESTOP_ACTIVE - Not-Aus aktiv
+Geändert: JA
+Aktiver Fehlerzustand: EMERGENCY_001_ESTOP_ACTIVE
+Fehlertitel: Not-Aus aktiv
+[EMERGENCY] EMERGENCY_001_ESTOP_ACTIVE: Not-Aus aktiv | signal=emergency_stop, value=True, limit=False required
+Status: BESTANDEN
+
+F09 erwartet: EMERGENCY_006_K2_TEMP_TOO_HIGH
+Übergang: MASHING -> EMERGENCY_006_K2_TEMP_TOO_HIGH
+Jetzt ist Zustand: EMERGENCY_006_K2_TEMP_TOO_HIGH
+Grund: EMERGENCY_006_K2_TEMP_TOO_HIGH - K2-Temperatur absolut zu hoch
+Geändert: JA
+Aktiver Fehlerzustand: EMERGENCY_006_K2_TEMP_TOO_HIGH
+Fehlertitel: K2-Temperatur absolut zu hoch
+[EMERGENCY] EMERGENCY_006_K2_TEMP_TOO_HIGH: K2-Temperatur absolut zu hoch | signal=k2_temperature_c, value=130, limit=120.0
+Status: BESTANDEN
+
+Fehlercode-Abnahme: 9/9 bestanden

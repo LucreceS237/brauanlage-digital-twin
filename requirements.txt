@@ -2,3 +2,5 @@ flask
 flask-cors
 pandas
 gunicorn
+python-docx>=1.1.0
+

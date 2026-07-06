@@ -1,0 +1,11 @@
+timestamp,aktueller_schritt,k1_temperatur,k1_fuellstand,k2_temperatur,k2_fuellstand,k3_temperatur,k3_fuellstand,k4_temperatur,k4_fuellstand,durchfluss_k1_k2,v3_open,v4_open,v5_open,pump_on,start_requested,acknowledge,emergency_stop,sensor_ok,data_quality
+2026-07-01T12:00:00.000,1,78,24,20,0,20,0,20,0,0.0,False,False,False,False,True,False,False,True,GOOD
+2026-07-01T12:00:10.000,2,50,24,20,0,20,0,20,0,1.2,True,False,False,False,True,False,False,True,GOOD
+2026-07-01T12:00:20.000,2,78,24,20,0,20,0,20,0,0.0,True,False,False,False,True,False,False,True,GOOD
+2026-07-01T12:00:30.000,3,78,24,40,18,20,0,20,0,0.0,False,False,False,False,True,False,False,True,GOOD
+2026-07-01T12:00:40.000,4,78,24,66,18,20,0,20,0,0.0,False,False,False,False,True,False,False,True,GOOD
+2026-07-01T12:00:50.000,6,78,24,110,18,20,16,20,0,0.0,False,False,False,False,True,False,False,True,GOOD
+2026-07-01T12:01:00.000,9,78,24,20,0,20,0,30,16,0.0,False,False,False,False,True,False,False,True,GOOD
+2026-07-01T12:01:10.000,6,78,24,99,18,20,0,20,0,0.0,False,False,False,False,True,False,True,True,GOOD
+2026-07-01T12:01:20.000,3,78,24,130,18,20,0,20,0,0.0,False,False,False,False,True,False,False,True,GOOD
+2026-07-01T12:01:30.000,2,78,24,20,0,20,0,20,0,1.2,True,False,False,False,True,False,False,True,BAD
